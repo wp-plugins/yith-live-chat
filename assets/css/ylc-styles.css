@@ -1,0 +1,11 @@
+.plugin-option .yit_options .option {
+    width: 40%;
+    padding-right: 10px;
+    min-width: 270px;
+}
+
+.textareas {
+    width: 100%;
+    height: 80px;
+    resize: none;
+}
