@@ -391,7 +391,7 @@ if ( ! class_exists( 'YITH_Livechat' ) ) {
                  'current_page'		=> $this->current_page,
                  'company_avatar'	=> '',
                  'ip' 				=> $this->ip,
-                 'max_guests'       => ( !empty( $options['max-chat-users'] ) ) ? $options['max-chat-users'] : 1,
+                 'max_guests'       => ( !empty( $options['max-chat-users'] ) ) ? $options['max-chat-users'] : 2,
                  'templates'        => array(
                      'chat_popup'           => file_get_contents( YLC_URL . 'templates/chat-frontend/chat-popup.php' ),
                      'connecting'           => file_get_contents( YLC_URL . 'templates/chat-frontend/connecting.php' ),
