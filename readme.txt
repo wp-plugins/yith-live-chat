@@ -22,7 +22,6 @@ Main features
 
 - Availability of different tabs, multiple chats
 
-Full documentation is available [here](http://yithemes.com/docs-plugins/yith-live chat/).
 
 == Installation ==
 
