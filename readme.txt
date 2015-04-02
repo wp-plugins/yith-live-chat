@@ -1,7 +1,7 @@
 === YITH Live Chat ===
 
 Contributors: yithemes
-Tags: themes, yit, yith, live chat, real time, firebase, ajax
+Tags: yit, yith, live chat, real time, firebase, ajax, customer help, customer support, free chat, live help, online support, helpdesk, chat, wordpress chat,  free live chat, group chat, online live chat, online support, plugin chat, private message
 Requires at least: 4.0
 Tested up to: 4.1.1
 Stable tag: 1.0.0
