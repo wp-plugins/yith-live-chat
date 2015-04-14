@@ -22,6 +22,7 @@ Main features
 
 - Availability of different tabs, multiple chats
 
+Full documentation is available [here](http://yithemes.com/docs-plugins/yith-live-chat/).
 
 == Installation ==
 
@@ -37,7 +38,7 @@ YITH Live Chat will add a new tab called "Live Chat" inside the YIT Plugins menu
 
 == Screenshots ==
 
-1. This is the main settings page for the plugin, you can find it inside the YIT Plugins menu. You must configure a Firebase App to make the plugin works.
+1. This is the main settings page for the plugin, you can find it inside the YIT Plugins menu. You must configure a Firebase App to make the plugin work.
 2. This is the text settings page for the plugin, you can find it inside the YIT Plugins menu. You can configure the text of the messages for the chat events.
 3. This is the chat console, you can find it in the main menu. Use it to talk with your clients.
 4. This is the front end chat.
