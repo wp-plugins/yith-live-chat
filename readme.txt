@@ -8,7 +8,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-YITH Live Chat Make your client comfortable as in a physical shop.
+YITH Live Chat, an exceptional plugin to make your clients feel comfortable as in a physical shop. Ask for information and get immediate feedback
 
 == Description ==
 
