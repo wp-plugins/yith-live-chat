@@ -178,11 +178,11 @@ if ( ! class_exists( 'YITH_Livechat' ) ) {
             /* === Add Chat Console Page === */
             if( current_user_can( 'manage_options' ) ) {
 
-                add_menu_page( $page_title, $page_title, 'manage_options', $this->_console_page, array( $this, 'get_console_template' ), YLC_ASSETS_URL  . '/images/favicon.png', 61 );
+                add_menu_page( $page_title, $page_title, 'manage_options', $this->_console_page, array( $this, 'get_console_template' ), YLC_ASSETS_URL  . '/images/favicon.png', 63 );
 
             } else if( current_user_can( 'answer_chat' ) ){
 
-                add_menu_page( $page_title, $page_title, 'ylc_chat_op', $this->_console_page, array( $this, 'get_console_template' ), YLC_ASSETS_URL  . '/images/favicon.png', 61 );
+                add_menu_page( $page_title, $page_title, 'ylc_chat_op', $this->_console_page, array( $this, 'get_console_template' ), YLC_ASSETS_URL  . '/images/favicon.png', 63 );
 
             }
 
