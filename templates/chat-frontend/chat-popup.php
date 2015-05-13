@@ -1,5 +1,5 @@
-<div id="YLC_chat" class="chat-widget" style="display: none;/* width: ylc.width;*/ right: 40px; bottom: 0; border-radius: ylc.radius;">
-    <div id="YLC_chat_header" class="chat-header" style="border-radius: ylc.radius; background-color: ylc.bg_color; color: ylc.color;">
+<div id="YLC_chat" class="chat-widget" style="ylc.widget_styles;">
+    <div id="YLC_chat_header" class="chat-header" style="ylc.header_styles;">
         <div class="chat-ico chat fa fa-comments"></div>
         <div class="chat-ico arrow-down fa fa-angle-down"></div>
         <div class="chat-title">

@@ -1,4 +1,4 @@
-<div id="YLC_popup_ntf"></div>
+
 <div class="chat-cnv" id="YLC_cnv">
     <div class="chat-welc">
         ylc.welc
@@ -8,7 +8,7 @@
     <a id="YLC_tool_end_chat" href="javascript:void(0)">
         <i class="fa fa-times"></i>
         ylc.end_chat
-    </a>
+    </a><div id="YLC_popup_ntf"></div>
 </div>
 <div class="chat-cnv-reply">
     <div class="chat-cnv-input">

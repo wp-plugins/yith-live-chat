@@ -1,5 +1,5 @@
 <?php
-namespace Firebase;
+//namespace Firebase;
 /**
  * Interface FirebaseInterface
  * @package Firebase

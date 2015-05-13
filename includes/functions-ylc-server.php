@@ -12,28 +12,27 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-if ( ! function_exists( 'get_ip_address' ) ) {
+if ( ! function_exists( 'ylc_get_ip_address' ) ) {
 
     /**
      * Get user IP address
      *
-     * @since  1.0.0
-     * @access public
-     * @return string
-     * @author Alberto ruggiero
+     * @since   1.0.0
+     * @return  string
+     * @author  Alberto ruggiero
      */
-    function get_ip_address() {
+    function ylc_get_ip_address() {
 
-        if ( get_server_item( 'REMOTE_ADDR' ) && get_server_item( 'HTTP_CLIENT_IP' ) ) {
+        if ( ylc_get_server_item( 'REMOTE_ADDR' ) && ylc_get_server_item( 'HTTP_CLIENT_IP' ) ) {
             $ip_addr = $_SERVER['HTTP_CLIENT_IP'];
         }
-        elseif ( get_server_item( 'REMOTE_ADDR' ) ) {
+        elseif ( ylc_get_server_item( 'REMOTE_ADDR' ) ) {
             $ip_addr = $_SERVER['REMOTE_ADDR'];
         }
-        elseif ( get_server_item( 'HTTP_CLIENT_IP' ) ) {
+        elseif ( ylc_get_server_item( 'HTTP_CLIENT_IP' ) ) {
             $ip_addr = $_SERVER['HTTP_CLIENT_IP'];
         }
-        elseif ( get_server_item( 'HTTP_X_FORWARDED_FOR' ) ) {
+        elseif ( ylc_get_server_item( 'HTTP_X_FORWARDED_FOR' ) ) {
             $ip_addr = $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
 
@@ -48,7 +47,7 @@ if ( ! function_exists( 'get_ip_address' ) ) {
             $ip_addr = trim( end( $x ) );
         }
 
-        if ( !validate_ip( $ip_addr ) ) {
+        if ( !ylc_validate_ip( $ip_addr ) ) {
             $ip_addr = '0.0.0.0';
         }
 
@@ -58,20 +57,17 @@ if ( ! function_exists( 'get_ip_address' ) ) {
 
 }
 
-if ( ! function_exists( 'get_server_item' ) ) {
+if ( ! function_exists( 'ylc_get_server_item' ) ) {
 
     /**
      * Get item from $_SERVER array
      *
      * @since   1.0.0
-     * @access  public
-     *
-     * @param    string $index
-     *
-     * @return    string
+     * @param   $index
+     * @return  string
      * @author  Alberto Ruggiero
      */
-    function get_server_item( $index = '' ) {
+    function ylc_get_server_item( $index = '' ) {
         if ( !isset( $_SERVER[$index] ) ) {
             return false;
         }
@@ -81,19 +77,18 @@ if ( ! function_exists( 'get_server_item' ) ) {
 
 }
 
-if ( ! function_exists( 'validate_ip' ) ) {
+if ( ! function_exists( 'ylc_validate_ip' ) ) {
 
     /**
      * Validate IP Address
      *
-     * @since  1.0.0
-     * @access public
-     * @param	string
-     * @param	string	ipv4 or ipv6
+     * @since   1.0.0
+     * @param	$ip
+     * @param	$which	(ipv4 or ipv6)
      * @return	bool
      * @author  Alberto Ruggiero
      */
-    function validate_ip( $ip, $which = '' ) {
+    function ylc_validate_ip( $ip, $which = '' ) {
 
         $which = strtolower( $which );
 
@@ -131,18 +126,17 @@ if ( ! function_exists( 'validate_ip' ) ) {
 
 }
 
-if ( ! function_exists( 'validate_ipv4' ) ) {
+if ( ! function_exists( 'ylc_validate_ipv4' ) ) {
 
     /**
      * Validate IPv4 Address
      *
-     * @since  1.0.0
-     * @access public
-     * @param	string
+     * @since   1.0.0
+     * @param	$ip
      * @return	bool
      * @author  Alberto Ruggiero
      */
-    function validate_ipv4( $ip ) {
+    function ylc_validate_ipv4( $ip ) {
 
         $ip_segments = explode( '.', $ip );
 
@@ -167,18 +161,17 @@ if ( ! function_exists( 'validate_ipv4' ) ) {
 
 }
 
-if ( ! function_exists( 'validate_ipv6' ) ) {
+if ( ! function_exists( 'ylc_validate_ipv6' ) ) {
 
     /**
      * Validate IPv6 Address
      *
-     * @since  1.0.0
-     * @access public
-     * @param	string
+     * @since   1.0.0
+     * @param	$str
      * @return	bool
      * @author  Alberto Ruggiero
      */
-    function validate_ipv6( $str ) {
+    function ylc_validate_ipv6( $str ) {
 
         // 8 groups, separated by : 0-ffff per group one set of consecutive 0 groups can be collapsed to ::
         $groups = 8;
@@ -193,7 +186,7 @@ if ( ! function_exists( 'validate_ipv6' ) ) {
         // PHP supports IPv4-mapped IPv6 addresses, so we'll expect those as well
         if ( strpos( end( $chunks ) , '.' ) !== false ) {
             $ipv4 = array_pop( $chunks );
-            if ( !validate_ipv4( $ipv4 ) ) {
+            if ( !ylc_validate_ipv4( $ipv4 ) ) {
                 return false;
             }
             $groups--;
@@ -224,18 +217,16 @@ if ( ! function_exists( 'validate_ipv6' ) ) {
 
 }
 
-if ( ! function_exists( 'get_current_page_url' ) ) {
+if ( ! function_exists( 'ylc_get_current_page_url' ) ) {
 
     /**
      * Get the user current page URL
      *
      * @since   1.0.0
-     * @access  public
-     * @param	string
      * @return	bool
      * @author  Alberto Ruggiero
      */
-    function get_current_page_url() {
+    function ylc_get_current_page_url() {
 
         $page_URL = 'http';
 

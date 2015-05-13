@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
-if ( ! function_exists( 'sanitize_text' ) ) {
+if ( ! function_exists( 'ylc_sanitize_text' ) ) {
 
     /**
      * Sanitize strings
@@ -23,7 +23,7 @@ if ( ! function_exists( 'sanitize_text' ) ) {
      * @return  string
      * @author  Alberto ruggiero
      */
-    function sanitize_text( $string, $html = false ) {
+    function ylc_sanitize_text( $string, $html = false ) {
         if( $html )
             return html_entity_decode( addslashes( $string ) );
         else
@@ -32,7 +32,7 @@ if ( ! function_exists( 'sanitize_text' ) ) {
 
 }
 
-if ( ! function_exists( 'get_plugin_options' ) ) {
+if ( ! function_exists( 'ylc_get_plugin_options' ) ) {
 
     /**
      * Get plugin options
@@ -41,7 +41,7 @@ if ( ! function_exists( 'get_plugin_options' ) ) {
      * @return  array
      * @author  Alberto ruggiero
      */
-    function get_plugin_options() {
+    function ylc_get_plugin_options() {
         global $yith_livechat;
 
         $options = $yith_livechat->options;
@@ -55,36 +55,34 @@ if ( ! function_exists( 'get_plugin_options' ) ) {
         if( !empty( $yith_livechat->user ) ) {
 
             // Add 'usr-' prefix, because user_id must be string
-            $xtra_prefix = ( is_user_logged_in() && !defined( 'YLC_OPERATOR' ) ) ? 'usr-' : '';
+            $xtra_prefix = ( is_user_logged_in() && ! defined( 'YLC_OPERATOR' ) ) ? 'usr-' : '';
 
             // Get user prefix
             $user_prefix = ( defined( 'YLC_OPERATOR' ) && is_admin() ) ? 'op-' : '';
 
             $user_info = array(
-                'id'        => $xtra_prefix . $user_prefix . $yith_livechat->user->ID,
-                'name'      => $yith_livechat->user->display_name,
-                'email'     => $yith_livechat->user->user_email,
-                'gravatar'  => ( !empty( $yith_livechat->user->user_email ) ) ? md5( $yith_livechat->user->user_email ) : null
+                'user_id'       => $xtra_prefix . $user_prefix . $yith_livechat->user->ID,
+                'user_name'     => $yith_livechat->user->display_name,
+                'user_email'    => $yith_livechat->user->user_email,
+                'user_type'     => 'visitor',
+                'avatar_type'   => apply_filters( 'ylc_avatar_type', 'default' ),
+                'avatar_image'  => apply_filters( 'ylc_avatar_image', '' ),
             );
         }
 
-
-        /**
-         * Get plugin options
-         */
-        return apply_filters( 'ylc_plugin_opts', array(
-                'app_id'        => $options['firebase-appurl'],
-                'users_list_id' => '',
-                'user_info'     => $user_info,
-                'after_load'    => $after_load,
-                'new_msg'       => $new_msg
-            )
+        return array(
+                'app_id'            => esc_html( $options['firebase-appurl'] ),
+                'users_list_id'     => '',
+                'user_info'         => $user_info,
+                'after_load'        => $after_load,
+                'new_msg'           => $new_msg,
+                apply_filters( 'ylc_plugin_opts_premium', array() )
         );
     }
+
 }
 
-
-if ( ! function_exists( 'print_plugin_options' ) ) {
+if ( ! function_exists( 'ylc_print_plugin_options' ) ) {
 
     /**
      * Print plugin options
@@ -95,7 +93,7 @@ if ( ! function_exists( 'print_plugin_options' ) ) {
      * @return  array
      * @author  Alberto ruggiero
      */
-    function print_plugin_options( $options, $property = null ) {
+    function ylc_print_plugin_options( $options, $property = null ) {
         $total_opts = count( $options );
 
         if ( $property ) {
@@ -119,7 +117,7 @@ if ( ! function_exists( 'print_plugin_options' ) ) {
 
             } else {                                                                                                        // Print array option
 
-                print_plugin_options( $option_value, $option_key );
+                ylc_print_plugin_options( $option_value, $option_key );
 
             }
 
@@ -128,6 +126,65 @@ if ( ! function_exists( 'print_plugin_options' ) ) {
 
         if ( $property ) {
             echo "},\n\t\t\t";
+        }
+
+    }
+
+}
+
+if ( ! function_exists( 'ylc_get_current_page' ) ) {
+
+    /**
+     * Get the current page name
+     *
+     * @since   1.0.0
+     * @return  string
+     * @author  Alberto ruggiero
+     */
+    function ylc_get_current_page() {
+
+        return ( ! empty( $_GET['page'] ) ) ? $_GET['page'] : '';
+
+    }
+
+}
+
+if ( ! function_exists( 'ylc_set_firebase_security' ) ){
+
+    /**
+     * Sets firebase security rules
+     *
+     * @since   1.0.0
+     * @return  void
+     * @author  Alberto ruggiero
+     */
+    function ylc_set_firebase_security() {
+        global $yith_livechat;
+
+        $options = $yith_livechat->options;
+
+        if( ! empty( $options['firebase-appurl'] ) && ! empty( $options['firebase-appsecret'] ) ) {
+
+            $last_update = get_option( 'ylc_security_version' );
+
+            if(  empty( $last_update ) || version_compare( YLC_VERSION, $last_update, '>' ) ) {
+
+                require_once YLC_DIR . '/includes/firebase/firebaseInterface.php';
+                require_once YLC_DIR . '/includes/firebase/firebaseLib.php';
+
+                $rules_json = file_get_contents( YLC_DIR . 'assets/ylc-rules.json' );
+                $path       = 'https://' . esc_html( $options['firebase-appurl'] ) . '.firebaseio.com/';
+                $firebase   = new FirebaseLib( $path, esc_html( $options['firebase-appsecret'] ) );
+
+                $resp       = json_decode( $firebase->set( '/.settings/rules', $rules_json ) );
+
+                if( ! empty( $resp->status ) ) {
+                    if( $resp->status == 'ok' )
+                        update_option( 'ylc_security_version', YLC_VERSION );
+                }
+
+            }
+
         }
 
     }

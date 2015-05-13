@@ -19,7 +19,7 @@ return array(
         /* =================== HOME =================== */
         'home'    => array(
             array(
-                'name'  => __( 'YITH Live Chat Texts Settings', 'ylc' ),
+                'name'  => __( 'YITH Live Chat: Message Settings', 'ylc' ),
                 'type'  => 'title'
             ),
             array(
@@ -29,7 +29,7 @@ return array(
         /* =================== END SKIN =================== */
 
         /* =================== MESSAGES =================== */
-        'texts' => array(
+        'settings' => array(
             array(
                 'name'              => __( 'Chat Title', 'ylc'),
                 'desc'              => __( 'This text will appear in the chat button and the chat title', 'ylc' ),
@@ -42,7 +42,7 @@ return array(
                 )
             ),
             array(
-                'name'              => __( 'Welcome message', 'ylc' ),
+                'name'              => __( 'Welcome Message', 'ylc' ),
                 'desc'              => __( 'This text will appear in the login form', 'ylc' ),
                 'id'                => 'text-welcome',
                 'type'              => 'textarea',
@@ -53,7 +53,7 @@ return array(
                 )
             ),
             array(
-                'name'              => __( 'Starting chat message', 'ylc' ),
+                'name'              => __( 'Starting Chat Message', 'ylc' ),
                 'desc'              => __( 'This text will appear when the chat starts', 'ylc' ),
                 'id'                => 'text-start-chat',
                 'type'              => 'textarea',
@@ -64,7 +64,7 @@ return array(
                 )
             ),
             array(
-                'name'              => __( 'Closing chat message', 'ylc' ),
+                'name'              => __( 'Closing Chat Message', 'ylc' ),
                 'desc'              => __( 'This text will appear at the end of the chat', 'ylc' ),
                 'id'                => 'text-close',
                 'type'              => 'textarea',
@@ -75,7 +75,7 @@ return array(
                 )
             ),
             array(
-                'name'              => __( 'Offline message', 'ylc' ),
+                'name'              => __( 'Offline Message', 'ylc' ),
                 'desc'              => __( 'This text will appear if no operator is online', 'ylc' ),
                 'id'                => 'text-offline',
                 'type'              => 'textarea',
@@ -86,7 +86,7 @@ return array(
                 )
             ),
             array(
-                'name'              => __( 'Busy message', 'ylc' ),
+                'name'              => __( 'Busy Message', 'ylc' ),
                 'desc'              => __( 'This text will appear if all operators are busy', 'ylc' ),
                 'id'                => 'text-busy',
                 'type'              => 'textarea',
