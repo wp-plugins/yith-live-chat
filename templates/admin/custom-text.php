@@ -19,21 +19,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 } // Exit if accessed directly
 
-$id                 = $this->_panel->get_id_field( $option['id'] );
-$name               = $this->_panel->get_name_field( $option['id'] );
-
-$custom_attributes = array();
-
-if ( ! empty( $option['custom_attributes'] ) && is_array( $option['custom_attributes'] ) ) {
-    foreach ( $option['custom_attributes'] as $attribute => $attribute_value ) {
-        $custom_attributes[] = esc_attr( $attribute ) . '="' . esc_attr( $attribute_value ) . '"';
-    }
-}
-
-$custom_attributes = implode( ' ', $custom_attributes );
+$id     = $this->_panel->get_id_field( $option['id'] );
+$name   = $this->_panel->get_name_field( $option['id'] );
 
 ?>
-<div id="<?php echo $id ?>-container" <?php if ( isset( $option['deps'] ) ): ?>data-field="<?php echo $id ?>" data-dep="<?php echo $this->get_id_field( $option['deps']['ids'] ) ?>" data-value="<?php echo $option['deps']['values'] ?>" <?php endif ?> class="yit_options rm_option rm_input rm_text">
+<div id="<?php echo $id ?>-container" <?php if ( isset( $option['deps'] ) ): ?>data-field="<?php echo $id ?>" data-dep="<?php echo $this->_panel->get_id_field( $option['deps']['ids'] ) ?>" data-value="<?php echo $option['deps']['values'] ?>" <?php endif ?> class="yit_options rm_option rm_input rm_text">
     <div class="option">
         http://<input type="text" name="<?php echo $name ?>" id="<?php echo $id ?>" value="<?php echo esc_attr( $db_value ) ?>" <?php echo $custom_attributes ?> />.firebaseIO.com
     </div>

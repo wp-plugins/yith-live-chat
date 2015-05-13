@@ -6,6 +6,14 @@
 
 .textareas {
     width: 100%;
+    min-height: 80px;
     height: 80px;
-    resize: none;
+    resize: vertical;
+}
+
+.textareas-css {
+    width: 100%;
+    min-height: 120px;
+    height: 80px;
+    resize: vertical;
 }

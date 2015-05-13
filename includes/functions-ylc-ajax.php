@@ -17,8 +17,8 @@ if ( ! function_exists( 'ylc_ajax_callback' ) ) {
     /**
      * Manage AJAX Callbacks
      *
-     * @return  array
      * @since   1.0.0
+     * @return  array
      * @author  Alberto Ruggiero
      */
     function ylc_ajax_callback() {
@@ -32,13 +32,20 @@ if ( ! function_exists( 'ylc_ajax_callback' ) ) {
             switch ( $_GET['mode'] ) {
 
                 case 'get_token':
-                    $resp = ajax_get_token();
+                    $resp = ylc_ajax_get_token();
                     break;
 
                 case 'save_chat':
-                    $resp = ajax_save_chat( $_POST );
+                    $resp = ylc_ajax_save_chat( $_POST );
                     break;
 
+                case 'offline_form':
+                    $resp = ylc_ajax_offline_form( $_REQUEST );
+                    break;
+
+                case 'chat_evaluation':
+                    $resp = ylc_ajax_evaluation( $_POST );
+                    break;
                 default:
                     throw new Exception( 'Wrong action: ' . @$_REQUEST['mode'] );
             }
@@ -59,16 +66,16 @@ if ( ! function_exists( 'ylc_ajax_callback' ) ) {
 
 }
 
-if ( ! function_exists( 'ajax_get_token' ) ) {
+if ( ! function_exists( 'ylc_ajax_get_token' ) ) {
 
     /**
      * Get token
      *
-     * @return  array
      * @since   1.0.0
+     * @return  array
      * @author  Alberto Ruggiero
      */
-    function ajax_get_token() {
+    function ylc_ajax_get_token() {
         global $yith_livechat;
 
         $token = $yith_livechat->user_auth();
@@ -78,24 +85,26 @@ if ( ! function_exists( 'ajax_get_token' ) ) {
 
 }
 
-if ( ! function_exists( 'ajax_save_chat' ) ) {
+if ( ! function_exists( 'ylc_ajax_save_chat' ) ) {
 
     /**
      * Save chat transcripts if premium active
      *
-     * @return  array
      * @since   1.0.0
+     * @param   $data
+     * @return  array
      * @author  Alberto Ruggiero
      */
-    function ajax_save_chat( $data ) {
+    function ylc_ajax_save_chat( $data ) {
 
-        $msg = __( 'Successfully closed!', 'ylc' );
+        $msg = array( 'msg' => __( 'Successfully closed!', 'ylc' ) );
 
         if ( defined( 'YLC_PREMIUM' ) ) {
-            $msg = ''; // TODO: premium save function
+
+            $msg = ylc_save_chat_data( $data );
         }
 
-        return array( 'msg' => $msg );
+        return $msg;
     }
 
 }

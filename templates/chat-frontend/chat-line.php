@@ -3,7 +3,7 @@
         ylc.time
     </div>
     <div class="chat-avatar">
-        ylc.avatar
+        <img src="ylc.avatar" />
     </div>
     <div class="chat-cnv-msg">
         <div class="chat-cnv-author">

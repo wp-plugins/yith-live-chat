@@ -1,16 +1,3 @@
-function string_replace( str, args ){
-
-    for (var key in args){
-        if ( args.hasOwnProperty( key ) ) {
-
-            var regex = new RegExp( 'ylc\.' + key , 'gm' );
-            str = str.replace( regex, args[ key ] )
-        }
-    }
-
-    return str;
-}
-
 (function ( $, window, document, undefined ) {
 	
 	var YLC = "ylc",
@@ -18,33 +5,31 @@ function string_replace( str, args ){
 		// The name of using in .data()
 		data_plugin = "plugin_" + YLC,
 
-        //Premium methods
-
 		// Default options
 		defaults = {
-			app_id 				: "", 			// App ID
-            render              : true,         // Render chatbox UI?
-            users_list_id 		: "#YLC_users", // List users in HTML element or leave it blank if no list
+			app_id 				: '',
+            render              : true,
+            users_list_id 		: '#YLC_users',
             display_login 		: true,
-            user_info 			: { 			// Default user info used when related field isn't sent by login/contact form
-                id 				: null,
-                name 			: null,
-                email 			: null
+            user_info 			: {
+                user_id         : null,
+                user_name       : null,
+                user_email      : null,
+                user_type       : null,
+                avatar_type     : null,
+                avatar_image    : null
             },
             styles              : {
-                colors          : {
-                    primary     : "#009edb",
-                    link 	    : "#459ac4"
-                },
-                border_radius   : "5px 5px 0 0",
-                anim            : {
-                    type        : "bounceInUp",
-                    anim_delay  : 1000
-                },
-                popup_width			: 370,      // px
-                btn_width           : 260,
-                form_width          : 260,
-                company_avatar   	: ''
+                bg_color        : '#009EDB',
+                x_pos           : 'right',
+                y_pos           : 'bottom',
+                border_radius   : '5px 5px 0 0',
+                popup_width     : 370,
+                btn_width       : 260,
+                form_width      : 260,
+                animation_type  : 'bounceIn',
+                autoplay        : true,
+                autoplay_delay  : 1000
             },
             before_load 		: $.noop, // Called before starting to load content
             after_load	 		: $.noop, // Called after plugin/content is loaded
@@ -57,28 +42,28 @@ function string_replace( str, args ){
             offline 			: $.noop, // Current user is offline now!
             new_msg				: $.noop, // New message received in any conversation
             user_online			: $.noop, // New user is online
-            user_offline		: $.noop, // A user appeared offline
             user_created		: $.noop, // New user created
             user_failed			: $.noop, // Failed to create new user
+            user_added			: $.noop, // User added to list
             cnv_msgs_loaded		: $.noop  // Current conversation messages loaded after calling reload_cnv() function
 
-        };
+        },
+        wait_interval =  null,
+        premium = {}; // premium options
 
-	// The Plugin constructor
 	function Plugin() {
 
-        this.opts = $.extend( {}, defaults ); // Plugin instantiation : You already can access element here using this.el
+        this.opts       = $.extend( {}, defaults );
+        this.premium    = $.extend( {}, premium );
 
     }
 	
 	Plugin.prototype = {
 	
-		init : function ( opts ) {
+		init                : function ( opts, premium ) {
 
-			// Extend opts ( http://api.jquery.com/jQuery.extend/ )
 			$.extend( this.opts, opts );
 
-			// Data holds variables to use in plugin
 			this.data = {
                 auth            : null, 		// Firebase auth reference
                 ref             : null, 		// Firebase chat reference
@@ -87,11 +72,11 @@ function string_replace( str, args ){
                 mode            : "offline",    // Current mode
                 logged          : false,        // Logged in?
                 assets_url      : ylc.plugin_url,
+                animation_delay : 1000,
+                show_delay      : 1000,
                 guest_prefix 	: "Guest-",
                 primary_fg      : null, 		// Primary foreground
                 primary_hover   : null, 		// Primary hover color
-                link_fg         : null,         // Link foreground
-                link_hover      : null, 		// Link hover color
                 popup_status 	: "close",      // Popup status: open, close
                 user 			: {}, 	        // User data
                 current_form 	: {}, 	        // Current form data
@@ -146,8 +131,8 @@ function string_replace( str, args ){
                     name_ph     : ylc.strings.fields.name_ph,
                     email       : ylc.strings.fields.email,
                     email_ph    : ylc.strings.fields.email_ph,
-                    message       : ylc.strings.fields.message,
-                    message_ph    : ylc.strings.fields.message_ph
+                    message     : ylc.strings.fields.message,
+                    message_ph  : ylc.strings.fields.message_ph
                 },
                 msg             : {
                     chat_title          : ylc.strings.msg.chat_title,
@@ -176,7 +161,7 @@ function string_replace( str, args ){
                     offline_btn         : ylc.strings.msg.offline_btn,
                     field_empty         : ylc.strings.msg.field_empty,
                     invalid_email       : ylc.strings.msg.invalid_email,
-                    op_not_allowed      : ylc.strings.msg.op_not_allowed,
+                    invalid_username    : ylc.strings.msg.invalid_username,
                     user_email          : ylc.strings.msg.user_email,
                     user_ip             : ylc.strings.msg.user_ip,
                     user_page           : ylc.strings.msg.user_page,
@@ -188,15 +173,21 @@ function string_replace( str, args ){
                     new_msg             : ylc.strings.msg.new_msg,
                     new_user_online     : ylc.strings.msg.new_user_online,
                     saving              : ylc.strings.msg.saving,
-                    waiting_users       : ylc.strings.msg.waiting_users
+                    waiting_users       : ylc.strings.msg.waiting_users,
+                    good                : ylc.strings.msg.good,
+                    bad                 : ylc.strings.msg.bad,
+                    chat_evaluation     : ylc.strings.msg.chat_evaluation,
+                    talking_label       : ylc.strings.msg.talking_label,
+                    timer               : ylc.strings.msg.timer,
+                    chat_copy           : ylc.strings.msg.chat_copy,
+                    already_logged      : ylc.strings.msg.already_logged
                 }
             };
 
             if ( ylc.is_premium ) {
-               //this.premium = $.extend( {}, premium );
+                $.extend( this.premium , premium );
             }
 
-			// Common objects
 			this.objs = {
 				btn				: null,
 				popup 			: null,
@@ -204,11 +195,17 @@ function string_replace( str, args ){
 				cnv 	 		: null
 			};
 
-			// Callback: Before load
-			if( false === this.trigger( "before_load" ) )
-				return;
+			if( false === this.trigger( 'before_load' ) ) {
+                return;
+            }
 
 			var self = this;
+
+            if ( ylc.is_premium ) {
+
+                this.trigger_premium( 'logged_users_auth' );
+
+            }
 
 			// Is mobile?
 			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test( navigator.userAgent ) ) {
@@ -216,11 +213,11 @@ function string_replace( str, args ){
 			}
 
 			// Get application token
-			this.post( 'get_token', {}, function( r ) {
-				if( !r.error ) {
+			this.post( 'ylc_ajax_callback', 'get_token', {}, function( r ) {
+				if( ! r.error ) {
 					self.data.auth_token = r.token;
 
-					self.run(); // Wait for token and then build UI
+					self.run();
 
 					if( ylc.is_op && ! ylc.is_front_end ){
                         self.auth();
@@ -228,89 +225,103 @@ function string_replace( str, args ){
 				}
 			});
 		},
-        run : function() {
+        /**
+         * Run Plugin
+         */
+        run                 : function () {
 
-            this.render_btn();      // Render chat button
-            this.render_popup();    // Render popup
-            this.check_ntf();       // Check desktop notifications
+            this.render_btn();
+            this.render_popup();
+            this.check_ntf();
+
+            /*if ( ylc.is_premium && ylc.is_front_end && this.opts.styles.autoplay ) {
+
+                this.trigger_premium( 'autoplay' );
+
+            }*/
 
         },
         /**
          * Authentication
          */
-        auth : function( callback ) {
+        auth                : function ( callback ) {
 
-            var self = this;
-
-            // Check if app id provided
-            if( !this.opts.app_id ) {
-                console.error( "App ID isn't provided" );
+            if( ! this.opts.app_id ) {
+                console.error( 'App ID not provided' );
                 return;
             }
 
-            // Create app references
+            if ( this.data.ref == null ) {
+
+                this.references();
+
+            }
+
+            if( this.opts.display_login ) {
+                this.login( false, callback );
+            } else {
+                this.login( true, callback );
+            }
+
+            this.trigger( 'after_load' );
+
+        },
+        /**
+         * References
+         */
+        references          : function () {
+            var self = this;
+
             this.data.ref       = new Firebase( "https://" + this.opts.app_id + '.firebaseIO.com' );
             this.data.ref_conn  = new Firebase( 'http://' + this.opts.app_id + '.firebaseIO.com/.info/connected' );
             this.data.ref_cnv   = new Firebase( 'http://' + this.opts.app_id + '.firebaseIO.com/chat_sessions' );
             this.data.ref_msgs  = new Firebase( 'http://' + this.opts.app_id + '.firebaseIO.com/chat_messages' );
             this.data.ref_users = new Firebase( 'http://' + this.opts.app_id + '.firebaseIO.com/chat_users' );
 
-            // Check if Firebase connected or lost
             this.data.ref.child( '.info/connected' ).on( 'value', function( snap ) {
 
                 if ( snap.val() === true ) {
-                    self.trigger( 'on_connect' ); // Callback: Connected
+                    self.trigger( 'on_connect' );
                 } else {
-                    self.trigger( 'on_disconnect' ); // Callback: Connected
+                    self.trigger( 'on_disconnect' );
                 }
 
             });
-
-            // Log in
-            if( this.opts.display_login )
-                this.login( false, true, callback ); // Render button here
-            else
-                this.login( true, true, callback ); // Render button here
-
-            // Callback: After plugin load
-            this.trigger( 'after_load' );
-
         },
         /**
          * Login
          */
-        login : function( new_user, render, callback ) {
+        login               : function ( new_user, callback ) {
 
             var self = this;
 
-            this.manage_conn(); // Check user connection
+            this.manage_conn();
 
-            // Create new user now or it is just page refresh to check authentication status
             this.data._new_user = new_user;
+            this.data.auth      = this.data.ref.authWithCustomToken( this.data.auth_token, function( error ) {
 
-            this.data.auth = this.data.ref.authWithCustomToken( this.data.auth_token, function( error ) { // Authenticate user
-
-                if( error ) { // An error occurred while attempting login
+                if( error ) {
 
                     console.error( error.code, error.message );
 
-                    self.trigger( 'auth_error', error ); // Callback: Authentication error
+                    self.trigger( 'auth_error', error );
 
-                    self.display_ntf( self.strings.msg.conn_err, 'error' ); // Display error
+                    self.display_ntf( self.strings.msg.conn_err, 'error' );
 
-                } else { // Authentication is succeed
+                } else {
 
-                    self.trigger( 'auth' ); // Callback: Authenticated in Firebase, but not logged in yet
+                    self.trigger( 'auth' );
 
-                    self.data.logged = true; // Now logged in
+                    self.data.logged = true;
 
-                    self.data.ref_users.once( 'value', function( snap ) { // Get operators and check current user
+                    self.data.ref_users.once( 'value', function( snap ) {
 
-                        var users = snap.val(),
-                            i = 0,
-                            guests = 0,
-                            wait = false,
-                            title = self.strings.msg.chat_title;
+                        var users           = snap.val(),
+                            guests          = 0,
+                            wait            = false,
+                            i               = 0,
+                            already_logged  = false,
+                            re_enter        = false;
 
                         if( users !== null ) {
 
@@ -318,57 +329,101 @@ function string_replace( str, args ){
 
                             $.each( users, function( user_id, user ) {
 
-                                i = i + 1; // Increase index
+                                i++;
 
                                 if( user ) {
 
-                                    // If operator is online, save in operators list
-                                    if( user.type == 'operator' && user.status === 'online' ) {
+                                    if( user.user_type == 'operator' && user.status === 'online' ) {
 
-                                        self.data.online_ops[user.id] = user; // Increase total number of operators
+                                        self.data.online_ops[ user.user_id ] = user;
 
                                     } else {
 
-                                        if( user.name !== undefined ) {
-                                            guests = guests + 1;
+                                        if ( user.user_type != 'operator' ) {
+
+                                            if ( user.user_name !== undefined && user.user_id != self.opts.user_info.user_id ) {
+                                                guests++;
+                                            }
+
+                                            if ( user.user_email !== undefined && self.data.current_form.user_email !== undefined ){
+
+                                                if ( user.user_email == self.data.current_form.user_email && ! ylc.frontend_op_access ) {
+
+                                                    if ( user.user_ip == ylc.user_ip ){
+
+                                                        if ( user.status === 'online' && user.user_id != self.opts.user_info.user_id   ) {
+
+                                                            already_logged = true;
+
+                                                        } else {
+
+                                                            re_enter = user.conversation_id;
+                                                        }
+
+                                                    } else {
+
+                                                        already_logged = true;
+
+                                                    }
+
+                                                }
+
+                                            }
+
+
                                         }
+
+
+
+
+
+
 
                                     }
 
                                 }
 
-                                if( i === total_user ) { // Last index in the while
+                                if ( already_logged ) {
 
-                                    if( !self.total_online_ops() ) { // Is there any online operator?
-                                        // Offline mode
-                                       self.show_offline(); // Show offline form
+                                    self.display_ntf( self.strings.msg.already_logged, 'error' );
 
-                                    } else { // Online mode
+                                } else {
 
-                                        if( guests >= ylc.max_guests ){
+                                    if( i === total_user ) {
 
-                                            wait = true;
+                                        if( ! self.total_online_ops() && ! re_enter) {
 
-                                            self.show_offline( true );
+                                            self.show_offline();
 
                                         } else {
 
-                                            if ( self.opts.display_login ) {
-                                                // Show login form
-                                                self.show_login();
+                                            if ( self.opts.user_info.user_type == 'operator' || guests < ylc.max_guests || ylc.max_guests == 0 ) {
 
-                                                // Online mode
+                                                if( wait_interval != null )
+                                                    clearInterval( wait_interval );
+
+                                                if ( self.opts.display_login ) {
+
+                                                    self.show_login();
+
+                                                } else {
+
+                                                    self.show_cnv( true );
+
+                                                }
+
                                             } else {
 
-                                                // Show conversation
-                                                self.show_cnv( true );
+                                                wait = true;
+                                                self.show_offline( true );
 
                                             }
+
                                         }
 
-                                    }
+                                        self.check_user( self.opts.user_info.user_id, wait, re_enter );
 
-                                    self.check_user( self.opts.user_info.id, wait ); // Get user from Firebase
+                                    }
 
                                 }
 
@@ -376,15 +431,13 @@ function string_replace( str, args ){
 
                         } else {
 
-                            self.show_offline(); // Show offline form
-
-                            self.check_user( self.opts.user_info.id, false ); // Get user from Firebase
+                            self.show_offline();
+                            self.check_user( self.opts.user_info.user_id, false );
 
                         }
 
                         if( callback )
-                            callback();
-
+                            callback( wait );
 
                     });
 
@@ -396,46 +449,19 @@ function string_replace( str, args ){
         /**
          * Logout from Firebase
          */
-        logout : function( logout_msg, end_chat ) {
+        logout              : function () {
 
             var self = this;
 
-            if( this.data.user.id ) {
+            if( this.data.user.user_id ) {
 
-                // Save transcript and delete data from Firebase
-                this.save_user_data( this.data.user.cnv_id, false, function() {
+                self.data.ref_user.off();   // Don't listen current user
 
-                    if ( end_chat ) {
+                self.data.ref_users.off();  // Don't listen users
 
-                        self.push_msg( '-- ' + self.strings.msg.close_msg_user + ' --' );
+                self.data.ref_msgs.off();   // Don't listen message anymore
 
-                    }
-
-                    self.data.ref_user.off();   // Don't listen current user
-
-                    self.data.ref_users.off();  // Don't listen users
-
-                    self.data.ref_msgs.off();   // Don't listen message anymore
-
-                    //self.data.ref.unauth();    // Log user out from Firebase
-                    //self.be_offline();          // Be offline
-
-                    // Set mode
-                    self.data.mode = 'offline';
-
-                    if( self.data.ref_user ) {
-
-                        // Set status offline in Firebase
-                        self.data.ref_user.child( 'status' ).set( 'offline' );
-
-                        // Set last online
-                        self.data.ref_user.child( 'last_online' ).set( Firebase.ServerValue.TIMESTAMP );
-
-                    }
-
-                    self.trigger( 'logged_out', logout_msg ); // Callback: Logged out
-
-                });
+                self.trigger( 'logged_out' ); // Callback: Logged out
 
             }
 
@@ -445,20 +471,39 @@ function string_replace( str, args ){
                 .removeClass()
                 .addClass( 'chat-body chat-form' )
                 .empty()
-                .html( self.get_template( 'offline', {
-                    lead 		: self.strings.msg.close_msg,
-                    form 		: ''
-                }));
+                .html( self.get_template( 'chat-offline', {
+                    lead : self.strings.msg.close_msg,
+                    form : ''
+                } ) );
+
+            if ( ylc.is_premium && ylc.chat_evaluation ) {
+
+                self.trigger_premium( 'show_chat_evaluation' );
+
+            } else if ( ylc.is_premium && ! ylc.chat_evaluation && ylc.send_transcript && self.data.user.user_email != '' ){
+
+                self.trigger_premium( 'show_copy_request' );
+
+            } else {
+
+                self.objs.popup_header.click( function() {
+
+                    self.minimize();
+                    self.objs.popup_header.off('click');
+
+                });
+
+                setTimeout( function() {
+
+                    self.be_offline();
+                    self.minimize();
+
+                }, 3000 );
+
+            }
 
             // Resize window to ensure chat box is responsive
-            $(window).trigger( 'resize' );
-
-            setTimeout( function() {
-
-                self.minimize();
-                self.check_mode( true );
-
-            }, 1000 );
+            $( window ).trigger( 'resize' );
 
             // Callback: Current user is offline now
             self.trigger( 'offline' );
@@ -466,7 +511,7 @@ function string_replace( str, args ){
         /**
          * Just be offline, don't logout completely
          */
-        be_offline : function() {
+        be_offline          : function () {
 
             // Set mode
             this.data.mode = 'offline';
@@ -491,7 +536,7 @@ function string_replace( str, args ){
         /**
          * Change mode if necessary!
          */
-        check_mode : function( force_offline ) {
+        check_mode          : function ( force_offline ) {
 
             if( ylc.is_front_end ) {
 
@@ -520,39 +565,34 @@ function string_replace( str, args ){
                         // Visitor is in conversation
                         case 'online':
 
-                            // Disable reply box
-                            if( this.opts.display_login ) {
+                            if ( ! ylc.is_premium ) {
 
-                                $('#YLC_cnv_reply').addClass('chat-disabled')
-                                    .attr( 'disabled', 'disabled' );
+                                if( this.opts.display_login ) {
 
-                                // No operators online!
-                                this.display_ntf( this.strings.msg.no_op + '!', 'error' );
+                                    $( '#YLC_cnv_reply' ).addClass( 'chat-disabled' ).attr( 'disabled', 'disabled' );
 
-                                // If no login form, show user contact form
-                            } else {
+                                    this.display_ntf( this.strings.msg.no_op + '!', 'error' );
 
-                                // Show offline
-                                this.show_offline();
+                                } else {
+
+                                    this.show_offline();
+                                }
 
                             }
 
                             break;
                     }
 
-                    // Update mode
                     this.data.mode = 'offline';
-
 
                     // Some operator(s) online now!
                 } else {
 
-                    // If last mode was online,
-                    // re-activate reply box and clean notifications
+                    // If last mode was online re-activate reply box and clean notifications
                     if( last_mode === 'offline' ) {
 
                         // Disable reply box
-                        $('#YLC_cnv_reply').removeClass('chat-disabled').removeAttr( 'disabled' );
+                        $( '#YLC_cnv_reply' ).removeClass( 'chat-disabled' ).removeAttr( 'disabled' );
 
                         this.clean_ntf(); // Clean notification
 
@@ -566,99 +606,9 @@ function string_replace( str, args ){
             }
         },
         /**
-         * Save user data into DB
-         */
-        save_user_data : function( cnv_id, delete_from_app, callback ) {
-
-            var self = this,
-                r = null; // Response
-
-            // First get conversation data
-            this.data.ref_cnv.child( cnv_id ).once( 'value', function( snap_cnv ) {
-
-                var cnv = snap_cnv.val();
-
-                if( !cnv )
-                    return;
-
-                // Get user id
-                var user_id = cnv.user_id;
-
-                // Get user data
-                self.data.ref_users.child( user_id ).once( 'value', function( snap_user ) {
-
-                    var user_data = snap_user.val();
-
-                    // Include conversation created time into user data
-                    user_data.cnv_time = cnv.created_at;
-
-                    // Get users messages from Firebase
-                    self.data.ref_msgs.once( 'value', function( snap_msgs ) {
-
-                        var msgs = snap_msgs.val(),
-                            total_msgs = msgs ? Object.keys( msgs ).length : 0,
-                            i = 0,
-                            msgs_data = {};
-
-                        if( msgs ) {
-
-                            $.each( msgs, function( msg_id, msg ) {
-
-                                // Increase index
-                                i = i + 1;
-
-                                if( msg.cnv_id === cnv_id ) {
-
-                                    // Add user message into data
-                                    msgs_data[msg_id] = msg;
-
-                                    // Delete msg from app if requested
-                                    if( delete_from_app )
-                                        self.data.ref_msgs.child( msg_id ).remove();
-
-                                }
-
-                                if( total_msgs === i ) { // Last index
-
-                                    // Add all user message into user data
-                                    user_data.msgs = msgs_data;
-
-                                    self.post( 'save_chat', user_data, function( r ) {
-
-                                        if( callback )
-                                            callback( r ); // Trigger callback
-
-                                    });
-
-                                }
-
-                            });
-
-                            // No message for checking...
-                        } else if( callback ) {
-                            callback( {} ); // Response is null here
-                        }
-
-                        if( delete_from_app ) {
-
-                            // Delete user from Firebase
-                            self.data.ref_users.child( user_id ).remove();
-
-                            // Delete conversation from app if requested
-                            self.data.ref_cnv.child( cnv_id ).remove();
-                        }
-
-                    });
-
-                });
-
-            });
-
-        },
-        /**
          * Show offline popup
          */
-        show_offline : function( busy ) {
+        show_offline        : function ( busy ) {
 
             var self = this;
 
@@ -671,73 +621,74 @@ function string_replace( str, args ){
                     return;
 
                 // Update popup header
-                self.objs.popup_header.find('.chat-title').html(this.strings.msg.chat_title);
+                self.objs.popup_header.find( '.chat-title' ).html( self.strings.msg.chat_title );
 
                 // Update popup wrapper
-                self.objs.popup.parent().removeClass().addClass('chat-offline');
+                self.objs.popup.parent().removeClass().addClass( 'chat-offline' );
 
                 // Render popup body
                 self.objs.popup_body
-                    .css('width', this.opts.styles.form_width + 'px')
+                    .css( 'width', this.opts.styles.form_width + 'px' )
                     .removeClass()
-                    .addClass('chat-body chat-form')
+                    .addClass( 'chat-body chat-form' )
                     .empty()
-                    .html(self.get_template('offline', {
-                        lead: ( busy ) ? self.strings.msg.busy_body : self.strings.msg.offline_body,
-                        form: ylc.is_premium ? self.premium.show_offline_form({
-                            btn_text     : self.strings.msg.start_chat,
-                            btn_color    : self.data.primary_fg,
-                            btn_bg       : self.opts.styles.colors.primary,
-                            field_name   : self.strings.fields.name,
-                            name_ph      : self.strings.fields.name_ph,
-                            field_email  : self.strings.fields.email,
-                            email_ph     : self.strings.fields.email_ph,
-                            field_message: self.strings.fields.message,
-                            message_ph   : self.strings.fields.message_ph
-                        }) : ''
-                    }));
+                    .html( self.get_template( 'chat-offline', {
+                        lead: ( busy ) ? self.strings.msg.busy_body : self.strings.msg.offline_body
+                    } ) );
+
+                if ( ( ( ! busy ) || ( busy && ylc.show_busy_form ) ) && ylc.is_premium ){
+
+                    self.trigger_premium( 'show_offline_form' )
+
+                }
 
                 // Resize window to ensure chat box is responsive
-                $(window).trigger('resize');
+                $( window ).trigger('resize');
 
-                setInterval( function() {
-                    var guests = 0;
+                if ( busy ) {
 
-                    self.data.ref_users.once( 'value', function( snap ) {
+                    if( wait_interval !=  null )
+                        clearInterval( wait_interval );
 
-                        var users = snap.val();
+                    wait_interval = setInterval( function() {
 
-                        if( users !== null ) {
+                        self.data.ref_users.once( 'value', function( snap ) {
 
-                            $.each( users, function( user_id, user ) {
+                            var users   = snap.val(),
+                                guests  = 0;
 
-                                if( user ) {
+                            if( users !== null ) {
 
-                                    if(  user.type != 'operator' && user.status === 'online' ) {
+                                $.each( users, function( user_id, user ) {
 
-                                        guests = guests + 1; // Increase index
+                                    if( user ) {
+
+
+                                        if( user.user_name !== undefined && user.user_type != 'operator' && user.user_id != self.opts.user_info.user_id ) {
+
+                                            guests++;
+                                        }
+
                                     }
 
-                                }
+                                });
+                            }
 
-                            });
+                            if ( guests < ylc.max_guests ) {
 
-                        }
+                                if( self.opts.display_login )
+                                    self.login( false );
+                                else
+                                    self.login( true );
+
+                            }
+
+                        });
 
 
-                    });
 
-                    if ( guests < ylc.max_guests ) {
-
-                        // Log in
-                        if( self.opts.display_login )
-                            self.login( false, true ); // Render button here
-                        else
-                            self.login( true, true ); // Render button here
-
-                    }
-
-                }, 5000 );
+                    }, 30000 );
+                }
 
             }
 
@@ -745,36 +696,35 @@ function string_replace( str, args ){
         /**
          * Show connecting popup
          */
-        show_connecting : function() {
+        show_connecting     : function () {
 
             // Turn back to "connecting" popup
             this.objs.popup_body
                 .css( 'width', this.opts.styles.form_width + 'px' )
-                .html( this.get_template( 'connecting', {
-                lead: this.strings.msg.connecting + '...'
+                .html( this.get_template( 'chat-connecting', {
+                    lead: this.strings.msg.connecting + '...'
             }));
 
         },
         /**
          * Show login form in chat box
          */
-        show_login : function( login_lead_msg, minimize ) {
+        show_login          : function ( login_lead_msg, minimize ) {
 
             var self = this;
 
             if( ylc.is_front_end ) {
 
-                // Allow displaying?
-                if( !this.allow_chatbox() )
+                if( ! this.allow_chatbox() ) {
                     return;
+                }
 
-                // Is it possible to show up login form?
                 if( this.opts.display_login && this.total_online_ops() && this.objs.popup ) {
                     // Update mode
                     this.data.mode = 'login';
 
                     // Update popup header
-                    this.objs.popup_header.find('.chat-title').html( this.strings.msg.chat_title );
+                    this.objs.popup_header.find( '.chat-title' ).html( this.strings.msg.chat_title );
 
                     // Update popup wrapper
                     this.objs.popup.parent().removeClass().addClass( 'chat-login' );
@@ -783,13 +733,12 @@ function string_replace( str, args ){
                     this.objs.popup_body
                         .css( 'width', this.opts.styles.form_width + 'px' )
                         .removeClass()
-                        .addClass('chat-body chat-form')
+                        .addClass( 'chat-body chat-form' )
                         .empty()
-                        .html( this.get_template( 'login', {
+                        .html( this.get_template( 'chat-login', {
                             lead 	    	: login_lead_msg || this.strings.msg.prechat_msg,
                             btn_text 	    : this.strings.msg.start_chat,
-                            btn_color    	: this.data.primary_fg,
-                            btn_bg 		    : this.opts.styles.colors.primary,
+                            btn_styles    	: ( ylc.is_premium ) ? this.trigger_premium( 'stylize', 'form_button' ) : '',
                             field_name      : this.strings.fields.name,
                             name_ph         : this.strings.fields.name_ph,
                             field_email     : this.strings.fields.email,
@@ -799,30 +748,24 @@ function string_replace( str, args ){
                     // Resize window to ensure chat box is responsive
                     $(window).trigger( 'resize' );
 
-                    // Login button hover
+                    // Login button functions
                     $( '#YLC_login_btn' ).hover(
                         function() {
-                            $(this).css('background-color', self.data.primary_hover );
+                            $( this ).css( 'background-color', self.data.primary_hover );
                         },
                         function() {
-                            $(this).css('background-color', self.opts.styles.colors.primary );
+                            $( this ).css( 'background-color', self.opts.styles.bg_color );
                         }
-                    );
-
-                    // Send login form
-                    $( '#YLC_login_btn' ).click( function() {
+                    ).click( function() {
 
                        self.send_login_form();
 
                     });
 
-                    // If user click enter in login form, send login form
                     $( '#YLC_popup_form' ).keydown( function( e ) {
 
-                        // When clicks ENTER key (but not shift + ENTER )
-                        if ( e.keyCode == 13 && !e.shiftKey ) {
+                        if ( e.keyCode == 13 && ! e.shiftKey ) {
                             e.preventDefault();
-
                             self.send_login_form();
                         }
 
@@ -833,10 +776,11 @@ function string_replace( str, args ){
                     // So show current mode
                 } else {
 
-                    if( self.data.mode === 'online' )
+                    if( self.data.mode === 'online' ) {
                         this.show_cnv();
-                    else
+                    } else {
                         this.show_offline();
+                    }
 
                 }
 
@@ -850,7 +794,7 @@ function string_replace( str, args ){
         /**
          * Send login form
          */
-        send_login_form : function() {
+        send_login_form     : function () {
 
             var self = this;
 
@@ -858,27 +802,27 @@ function string_replace( str, args ){
             this.display_ntf( this.strings.msg.connecting + '...', 'sending' );
 
             // Get login form data
-            var form_data = $( '#YLC_popup_form' ).serializeArray(),
+            var form_data   = $( '#YLC_popup_form' ).serializeArray(),
                 form_length = form_data.length - 1;
 
             // Validate login form
             $.each( form_data, function( i, f ) {
 
                 // Update current form data
-                self.data.current_form[f.name] = f.value;
+                self.data.current_form[ f.name ] = f.value;
 
                     // Is empty?
-                    if( !f.value ) {
+                    if( ! f.value ) {
                         self.display_ntf( self.strings.msg.field_empty, 'error' );
 
                         return false;
                     }
 
                     // Is valid email?
-                    if( f.name === 'email' ) {
+                    if( f.name === 'user_email' ) {
 
                         // Invalid email!
-                        if( !self.validate_email( f.value ) ) {
+                        if( ! self.validate_email( f.value ) ) {
 
                             self.display_ntf( self.strings.msg.invalid_email, 'error' );
 
@@ -890,18 +834,27 @@ function string_replace( str, args ){
                             self.data.current_form.gravatar = self.md5( f.value );
 
                         }
+
+                    } else {
+
+                        var re = /^[a-zA-Z0-9._@ -]+$/gim;
+
+                        if( ! re.test( f.value ) ) {
+                            self.display_ntf( self.strings.msg.invalid_username, 'error' );
+                            return false;
+                        }
+
                     }
 
                 // Log user in now (form is valid)
+                if( i === form_length ) {
 
-                setTimeout( function() {
+                    setTimeout( function() {
 
-                    if( i === form_length ) {
                         self.login( true );
-                    }
 
-                }, 10000 );
-
+                    }, 10000 );
+                }
 
             });
 
@@ -911,7 +864,7 @@ function string_replace( str, args ){
         /**
          * Check user if exists in Firebase
          */
-        check_user : function( user_id, wait ) {
+        check_user          : function ( user_id, wait, re_enter ) {
 
             var self = this;
 
@@ -924,42 +877,57 @@ function string_replace( str, args ){
 
             } else {
 
-            // Get user
-            this.data.ref_user.once( 'value', function( snap ) {
+                // Get user
+                this.data.ref_user.once( 'value', function( snap ) {
 
-                var user_data = snap.val();
+                    var user_data = snap.val();
 
-                // User data must always be object
-                if( !user_data )
-                    user_data = {};
+                    // User data must always be object
+                    if( !user_data )
+                        user_data = {};
 
-                // Get user now
-                self.get_user( user_id, user_data );
+                    // Get user now
+                    self.get_user( user_id, user_data, re_enter );
 
-            }); }
+                });
+
+                this.data.ref_user.child( 'chat_with' ).on( 'value', function( snap ){
+
+                    var value = snap.val();
+
+                    if ( value != null ) {
+
+                        self.data.user.chat_with = value;
+
+                    }
+
+                });
+            }
 
             // Check current user connectivity
-            this.data.ref_user.on( 'child_removed', function( snap ) {
+            this.data.ref_users.on( 'child_removed', function( snap ) {
 
                 var user = snap.val();
 
-                if( !user )
+                if( ! user ) {
                     return;
+                }
 
-                if( self.data.mode === 'online' && !user.status )
+                if( user_id === user.user_id  ){
                     self.logout();
+                }
 
             });
         },
         /**
          * Get user from Firebase. If not exists, create new one
          */
-        get_user : function( user_id, user_data, callback ) {
+        get_user            : function ( user_id, user_data, re_enter, callback ) {
 
             var self = this;
 
             // Get current user data
-            if( user_data.id ) {
+            if( user_data.user_id ) {
 
                 // Get user data
                 this.data.user = user_data;
@@ -968,14 +936,16 @@ function string_replace( str, args ){
                 this.data.ref_user.child( 'status' ).set( 'online' );
 
                 // Update other user data
-                this.data.ref_user.child( 'ip' ).set( ylc.ip );
+                this.data.ref_user.child( 'user_ip' ).set( ylc.user_ip );
                 this.data.ref_user.child( 'current_page' ).set( ylc.current_page );
 
                 // Also update basic user information in any case
                 if( ylc.user_name && !ylc.is_front_end ) {
-                    this.data.ref_user.child( 'name' ).set( ylc.user_name );
-                    this.data.ref_user.child( 'email' ).set( ylc.user_email );
+                    this.data.ref_user.child( 'user_name' ).set( ylc.user_name );
+                    this.data.ref_user.child( 'user_email' ).set( ylc.user_email );
                     this.data.ref_user.child( 'gravatar' ).set( ylc.user_email_hash );
+                    this.data.ref_user.child( 'avatar_type' ).set( ylc.avatar_type );
+                    this.data.ref_user.child( 'avatar_image' ).set( ylc.avatar_image );
                 }
 
                 // Show conversation
@@ -1004,38 +974,49 @@ function string_replace( str, args ){
                 // Create new conversation
                 var cnv = this.data.ref_cnv.push({
                         user_id 	: user_id,
-                        created_at 	: Firebase.ServerValue.TIMESTAMP
+                        created_at 	: Firebase.ServerValue.TIMESTAMP,
+                        accepted_at : '',
+                        evaluation  : '',
+                        user_type   : ylc.is_op ? 'operator' : 'visitor',
+                        receive_copy: false
                     }),
-
-                // Prepare user data
+                    // Prepare user data
                     data = {
-                        id 				: user_id,
-                        cnv_id 			: cnv.key(),
-                        ip 				: ylc.ip,
+                        user_id         : user_id,
+                        conversation_id : cnv.key(),
+                        last_online     : '',
+                        user_ip 		: ylc.user_ip,
                         is_mobile 		: this.data.is_mobile,
                         current_page 	: ylc.current_page,
-                        type 			: ylc.is_op ? 'operator' : 'visitor',
+                        user_type 		: ylc.is_op ? 'operator' : 'visitor',
+                        chat_with       : 'free',
                         status 			: 'online' // Connection status
                     };
 
+
+                /*if ( ylc.is_premium && ylc.is_front_end && this.opts.styles.autoplay ) {
+
+                    this.trigger_premium( 'autoplay_msg', cnv.key() );
+
+                }*/
+
                 // Merge with default user data
-                for ( var d in this.opts.user_info ) { data[d] = this.opts.user_info[d]; }
+                for ( var i in this.opts.user_info ) { data[ i ] = this.opts.user_info[ i ]; }
 
 
                 // Merge with login form data
-                for ( var d in this.data.current_form ) { data[d] = this.data.current_form[d]; }
+                for ( var d in this.data.current_form ) { data[ d ] = this.data.current_form[ d ]; }
 
                 // Name field is empty? Find a name for user
-                if( !data.name ) {
+                if( ! data.user_name ) {
 
                     // Use email localdomain part
-                    if( data.email ) {
-                        data.name = data.email.substring( 0, data.email.indexOf( '@' ) );
+                    if( data.user_email ) {
+                        data.user_name = data.user_email.substring( 0, data.user_email.indexOf( '@' ) );
 
                         // Give user a random name
                     } else {
-                        data.name = this.data.guest_prefix + this.random_id( 1000, 5000 );
-
+                        data.user_name = this.data.guest_prefix + this.random_id( 1000, 5000 );
                     }
                 }
 
@@ -1045,7 +1026,7 @@ function string_replace( str, args ){
                 // Create user in Firebase
                 this.data.ref_user.set( data, function( error ) {
 
-                    if( !error ) {
+                    if( ! error ) {
 
                         // Show conversation
                         self.show_cnv();
@@ -1061,6 +1042,23 @@ function string_replace( str, args ){
 
                         // Now listen users activity
                         self.listen_users();
+
+                        if ( re_enter ){
+
+                            if ( ylc.is_premium ) {
+
+                                var now     = new Date();
+                                self.trigger_premium( 'save_user_data', re_enter, true, now.getTime(), false );
+
+                            } else {
+
+                                self.clear_user_data( re_enter );
+
+                            }
+
+                        }
+
+
 
                     } else {
 
@@ -1086,7 +1084,7 @@ function string_replace( str, args ){
         /**
          * Show conversation in chat box
          */
-        show_cnv : function( no_anim ) {
+        show_cnv            : function ( no_anim ) {
 
             var self = this;
 
@@ -1096,11 +1094,11 @@ function string_replace( str, args ){
             if( ylc.is_front_end ) {
 
                 // Allow displaying?
-                if( !this.allow_chatbox() )
+                if( ! this.allow_chatbox() )
                     return;
 
                 // Update popup header
-                this.objs.popup_header.find('.chat-title').html( this.strings.msg.chat_title );
+                this.objs.popup_header.find( '.chat-title' ).html( this.strings.msg.chat_title );
 
                 // Update popup wrapper
                 this.objs.popup.parent().removeClass().addClass( 'chat-online' );
@@ -1109,9 +1107,9 @@ function string_replace( str, args ){
                 this.objs.popup_body
                     .css( 'width', this.opts.styles.popup_width + 'px' )
                     .removeClass()
-                    .addClass('chat-body chat-online')
+                    .addClass( 'chat-body chat-online' )
                     .empty()
-                    .html( this.get_template('online-user', {
+                    .html( this.get_template( 'chat-conversation', {
                             reply_ph 	: this.strings.msg.reply_ph,
                             welc 		: this.strings.msg.welc_msg,
                             end_chat 	: this.strings.msg.end_chat
@@ -1121,7 +1119,7 @@ function string_replace( str, args ){
                 this.objs.cnv = $( '#YLC_cnv' );
 
                 // Autosize and focus reply box
-                if( !no_anim ) {
+                if( ! no_anim ) {
 
                     $( '#YLC_cnv_reply' ).focus().autosize( { append: '' } ).trigger( 'autosize.resize' );
 
@@ -1131,12 +1129,12 @@ function string_replace( str, args ){
 
                         $( '#YLC_cnv_reply' ).focus().autosize( { append: '' } ).trigger( 'autosize.resize' );
 
-                    }, this.opts.styles.anim.anim_delay);
+                    }, this.data.animation_delay );
 
                 }
 
                 // Resize window to ensure chat box is responsive
-                $(window).trigger( 'resize' );
+                $( window ).trigger( 'resize' );
 
                 // Listen messages
                 this.listen_msgs();
@@ -1144,7 +1142,9 @@ function string_replace( str, args ){
                 // Logout (End chat)
                 $( '#YLC_tool_end_chat' ).click( function() {
 
-                    self.logout( '', true );
+                    self.push_msg( '-- ' + self.strings.msg.close_msg_user + ' --' );
+                    self.data.ref_cnv.child( self.data.user.conversation_id ).child( 'status' ).set( 'closed' );
+                    self.logout();
 
                     return;
 
@@ -1158,7 +1158,7 @@ function string_replace( str, args ){
         /**
          * Get users
          */
-        listen_users : function() {
+        listen_users        : function () {
 
             var self = this;
 
@@ -1198,13 +1198,17 @@ function string_replace( str, args ){
 
                         if( user ) {
 
-                            if( user.type === 'operator' ) {
+                            if( user.user_type === 'operator' ) {
 
                                 // Check operator connection
                                 if( user.status === 'online' ) {
-                                    self.data.online_ops[user.id] = user;
-                                } else
-                                    delete self.data.online_ops[user.id];
+
+                                    self.data.online_ops[ user.user_id ] = user;
+
+                                } else {
+
+                                    delete self.data.online_ops[ user.user_id ];
+                                }
 
                             }
 
@@ -1228,13 +1232,11 @@ function string_replace( str, args ){
                 }
 
             });
-
-
         },
         /**
          * Listen new users
          */
-        listen_new_users : function( callback ) {
+        listen_new_users    : function ( callback ) {
 
             var self = this;
 
@@ -1258,32 +1260,32 @@ function string_replace( str, args ){
         /**
          * Update user info in Firebase
          */
-        update_user : function( user, prev_id ) {
+        update_user         : function ( user, prev_id ) {
 
             if( user ) {
 
                 // User is not ready for adding wait for all information added into Firebase
-                if( !user.id ) {
+                if( ! user.user_id ) {
                     return;
                 }
             }
 
             if( user ) {
 
-                if( user.cnv_id ) {
+                if( user.conversation_id ) {
 
                     // Add user item into the list
                     this.add_user_item( user );
 
-                    if( user.type === 'operator' ) { // Don't repeat same changes triggered more than once
+                    if( user.user_type === 'operator' ) { // Don't repeat same changes triggered more than once
 
                         // Increase total operator number
                         if( user.status === 'online' ) {
-                            this.data.online_ops[user.id] = user;
+                            this.data.online_ops[ user.user_id ] = user;
 
                             // Decrease total number of operator
                         } else {
-                            delete this.data.online_ops[user.id];
+                            delete this.data.online_ops[ user.user_id ];
                         }
 
                     }
@@ -1292,18 +1294,18 @@ function string_replace( str, args ){
                     this.check_mode();
 
                     // Callback: New user is online!
-                    if( !prev_id )
+                    if( ! prev_id )
                         this.trigger( 'user_online', user );
 
                     // Update user active page url
-                    if( !ylc.is_front_end && this.data.active_user_id === user.id )
-                        $( '#YLC_active_page' ).attr( 'href', user.current_page ).find('span').html( user.current_page );
+                    if( ! ylc.is_front_end && this.data.active_user_id === user.user_id )
+                        $( '#YLC_active_page' ).attr( 'href', user.current_page ).find( 'span' ).html( user.current_page );
 
                     // Remove user. It is trash! Because it doesn't have cnv_id
                 } else {
 
                     // Save user data, and then delete from Firebase
-                    this.clean_user_data( user.id );
+                    this.clean_user_data( user.user_id );
 
                 }
             }
@@ -1315,10 +1317,10 @@ function string_replace( str, args ){
         /**
          * Clean user data from Firebase
          */
-        clean_user_data : function( user_id ) {
+        clean_user_data     : function ( user_id ) {
 
-            var self = this,
-                ref_user = this.data.ref_users.child( user_id );
+            var self        = this,
+                ref_user    = this.data.ref_users.child( user_id );
 
             // Remove user from users list
             ref_user.once( 'value', function( snap ) {
@@ -1329,8 +1331,8 @@ function string_replace( str, args ){
                 ref_user.remove();
 
                 // Clean user conversation
-                if( user.cnv_id ) {
-                    self.ref_cnv.child( user.cnv_id );
+                if( user.conversation_id ) {
+                    self.ref_cnv.child( user.conversation_id );
                 }
 
                 // Remove user messages
@@ -1356,35 +1358,67 @@ function string_replace( str, args ){
         /**
          * Add user into the list
          */
-        add_user_item : function( user ) {
+        add_user_item       : function ( user ) {
 
-            var self = this;
-
-            // If no list or user_id, don't try to add user into the list also delete from the list
-            if( !user.id || !this.data.user_list )
+            if( ! user.user_id || ! this.data.user_list )
                 return;
 
-            var last_online = ( user.status === 'offline' ) ? ' - <span class="last-online" data-time="'+ user.last_online + '">' + this.timeago( user.last_online ) + '</span>' : '';
+            var username    = '',
+                is_busy     = false;
 
-            // First remove user item from the list if exists
-            $( '#YLC_chat_user_' + user.id ).remove();
+            if ( user.chat_with != 'free' ) {
 
-            // Render user item
-            this.data.user_list.append( this.get_template( 'user-item', {
-                id 			: user.id,
-                class 		: 'user-' + user.status + ' user-' + user.type,
-                color 		: user.color || 'transparent',
-                username	: user.name || user.email || 'N/A',
-                avatar  	: '<img src="' + this.set_avatar( user.gravatar, user.type ) + '" />',
-                cnv_id 		: user.cnv_id,
-                meta 		: user.type + last_online
+                if ( this.data.online_ops[ user.chat_with ] == null ) {
+
+                    this.data.ref_users.child( user.user_id ).child( 'chat_with' ).set( 'free' );
+                    is_busy = false;
+
+                } else {
+
+                    is_busy = ( user.chat_with != this.data.user.user_id );
+                    username = this.data.online_ops[ user.chat_with ]['user_name']
+
+                }
+
+            }
+
+            var user_status = ( is_busy ) ? ' busy' : ' free';
+
+            var last_online = ( user.status === 'offline' || user.status === 'wait' ) ? ' - <span class="other-info" data-time="' + user.last_online + '">' + this.timeago( user.last_online ) + '</span>' : '',
+                user_info   = ( is_busy ) ? '<br /><span class="other-info">' + this.strings.msg.talking_label.replace( /%s/i, username ) + '</span>' : '';
+
+            if ( user.user_type == 'operator' ) {
+                user_status = ' op';
+            }
+
+
+            $( '#YLC_chat_user_' + user.user_id ).remove();
+
+            this.data.user_list.append( this.get_template( 'console-user-item', {
+                id 			    : user.user_id,
+                class 		    : 'user-' + user.status + ' user-' + user.user_type + user_status,
+                color 		    : user.color || 'transparent',
+                username        : user.user_name || user.user_email || 'N/A',
+                is_mobile	    : ( user.is_mobile ) ? '<i class="fa fa-mobile"></i>' : '',
+                avatar  	    : this.set_avatar( user.user_type, {
+                    gravatar    :  user.gravatar,
+                    avatar_type :  user.avatar_type,
+                    avatar_image:  user.avatar_image
+                } ),
+                cnv_id 		    : user.conversation_id,
+                chat_with       : user.chat_with,
+                meta 		    : user.user_type + last_online + user_info
             } ) );
+
+            this.trigger( 'user_added', user.user_id );
+
+            $( window ).trigger( 'resize' );
 
         },
         /**
-         * Dekstop Notifications
+         * Desktop Notifications
          */
-        notify : function( title, msg, callback, tag ) {
+        notify              : function ( title, msg, callback, tag ) {
 
             // No notification support and don't show it on front end
             if( !Notification || ylc.is_front_end )
@@ -1400,9 +1434,9 @@ function string_replace( str, args ){
 
                 // If it's okay let's create a notification
                 var notification = new Notification( title, {
-                    body: msg,
-                    icon: ylc.plugin_url + '/images/ylc-ico.png',
-                    tag: tag
+                    body    : msg,
+                    icon    : ylc.plugin_url + '/images/ylc-ico.png',
+                    tag     : tag
                 });
 
                 if( callback )
@@ -1419,15 +1453,15 @@ function string_replace( str, args ){
                 // Note, Chrome does not implement the permission static property
                 // So we have to check for NOT 'denied' instead of 'default'
             } else if ( Notification.permission !== 'denied' ) {
-                Notification.requestPermission(function (permission) {
+                Notification.requestPermission( function ( permission ) {
 
                     // Whatever the user answers, we make sure we store the information
-                    if (!('permission' in Notification)) {
+                    if ( !( 'permission' in Notification ) ) {
                         Notification.permission = permission;
                     }
 
                     // If the user is okay, let's create a notification
-                    if (permission === "granted") {
+                    if ( permission === "granted" ) {
 
                         // If it's okay let's create a notification
                         var notification = new Notification( title, {
@@ -1452,44 +1486,43 @@ function string_replace( str, args ){
         /**
          * Set avatar for user or operator
          */
-        set_avatar: function( email_hash, is_op){
+        set_avatar          : function ( user_type, user_data ) {
 
-            var user_type       = ( is_op == 'operator' ) ? 'admin' : 'user',
-                default_avatar  = this.data.assets_url + '/images/default-avatar-' + user_type + '.png';
+            user_type = ( user_type == 'operator' ) ? 'admin' : 'user';
 
             if ( ylc.is_premium ) {
 
+                return this.trigger_premium( 'set_avatar_premium', user_type, user_data )
 
             } else {
 
-                    return default_avatar;
+                return this.data.assets_url + '/images/default-avatar-' + user_type + '.png';
 
             }
-
 
         },
         /**
          * Time template
          */
-        time : function( t, n ) {
+        time                : function ( t, n ) {
 
-            return this.strings.time[t] && this.strings.time[t].replace( /%d/i, Math.abs( Math.round( n ) ) );
+            return this.strings.time[ t ] && this.strings.time[ t ].replace( /%d/i, Math.abs( Math.round( n ) ) );
 
         },
         /**
          * Time ago function
          */
-        timeago : function( time ) {
+        timeago             : function ( time ) {
 
-            if ( !time )
+            if ( ! time )
                 return '';
 
-            var now = new Date(),
+            var now     = new Date(),
                 seconds = ( ( now.getTime() - time ) * 0.001 ) >> 0,
                 minutes = seconds / 60,
-                hours = minutes / 60,
-                days = hours / 24,
-                years = days / 365;
+                hours   = minutes / 60,
+                days    = hours / 24,
+                years   = days / 365;
 
             return (
             seconds < 45 && this.time( 'seconds', seconds ) ||
@@ -1509,7 +1542,7 @@ function string_replace( str, args ){
         /**
          * Listen message
          */
-        listen_msgs : function() {
+        listen_msgs         : function () {
 
             var self = this;
 
@@ -1519,10 +1552,9 @@ function string_replace( str, args ){
             // Get current messages
             this.data.ref_msgs.once( 'value', function( snap ) {
 
-                var msgs = snap.val(),
-                    total_msgs = msgs ? Object.keys( msgs ).length : 0,
-                    i = 1;
-
+                var msgs        = snap.val(),
+                    total_msgs  = msgs ? Object.keys( msgs ).length : 0,
+                    i           = 1;
 
                 // Load old messages after page refresh
                 if( msgs ) {
@@ -1530,7 +1562,7 @@ function string_replace( str, args ){
                     $.each( msgs, function( msg_id, msg) {
 
                         // Update current conversation (front-end only)
-                        if( ylc.is_front_end && self.data.user.cnv_id == msg.cnv_id) {
+                        if( ylc.is_front_end && self.data.user.conversation_id == msg.conversation_id ) {
 
                             msg.id = msg_id; // Include msg id
 
@@ -1567,35 +1599,34 @@ function string_replace( str, args ){
         /**
          * Listen new messages
          */
-        listen_new_msgs : function( msg_id ) {
+        listen_new_msgs     : function ( msg_id ) {
 
-            var self = this,
-                ref_msgs = !msg_id ? self.data.ref_msgs : self.data.ref_msgs.startAt( null, msg_id ),
-                first = true;
+            var self        = this,
+                ref_msgs    = ! msg_id ? self.data.ref_msgs : self.data.ref_msgs.startAt( null, msg_id ),
+                first       = true;
 
             // Don't ignore first message when you check all messages
-            if( !msg_id )
+            if( ! msg_id )
                 first = false;
 
             ref_msgs.on( 'child_added', function( new_snap ) {
 
-                var new_msg = new_snap.val(),
-                    new_msg_id = new_snap.key();
+                var new_msg     = new_snap.val();
 
                 // Include message id
-                new_msg.id = new_msg_id;
+                new_msg.id = new_snap.key();
 
                 // Update current conversation (front-end only)
-                if( ylc.is_front_end && self.data.user.cnv_id == new_msg.cnv_id ) {
+                if( ylc.is_front_end && self.data.user.conversation_id == new_msg.conversation_id ) {
 
                     // Ignore first message
-                    if( !first )
+                    if( ! first )
                         self.add_msg( new_msg );
 
                 }
 
                 // Show popup when new message arrived!
-                if( !first )
+                if( ! first )
                     self.show_popup();
 
                 // Callback: New message arrived
@@ -1610,35 +1641,34 @@ function string_replace( str, args ){
         /**
          * Add message into conversation
          */
-        add_msg : function( msg, last_user_id, last_msg_id ) {
+        add_msg             : function ( msg, last_user_id, last_msg_id ) {
 
-            var now = new Date(),
-                d = new Date( msg.time ), // Chat message date
-                t = d.getHours() + ':' + ( d.getMinutes() < 10 ? '0' : '' ) + d.getMinutes(), // Chat message time
+            var now         = new Date(),
+                d           = new Date( msg.msg_time ), // Chat message date
+                t           = d.getHours() + ':' + ( d.getMinutes() < 10 ? '0' : '' ) + d.getMinutes(), // Chat message time
                 msg_content = this.sanitize_msg( msg.msg ),
-
-            // Set message time either time or short date like '21 May'
-                msg_time = ( d.toDateString() == now.toDateString() ) ? t : d.getUTCDate() + ' ' + this.strings.months_short[ d.getUTCMonth() ] + ', ' + t;
-
-            // Render chat line
-            chat_line = this.get_template( 'chat-line', {
-                msg_id 		: msg.id,
-                time 		: msg_time,
-                date 		: d.getUTCDate() + ' ' + this.strings.months[ d.getUTCMonth() ] + ' ' + d.getUTCFullYear() + ' ' + t,
-                color 		: 'transparent',
-                avatar  	: '<img src="' + this.set_avatar( msg.gravatar, msg.user_type ) + '" />',
-                name 		: msg.name,
-                msg 		: msg_content,
-                class 		: ( msg.user_id == this.data.user.id ) ? ' chat-you' : ''
-            });
+                msg_time    = ( d.toDateString() == now.toDateString() ) ? t : d.getUTCDate() + ' ' + this.strings.months_short[ d.getUTCMonth() ] + ', ' + t; // Set message time either time or short date like '21 May'
 
             // Hide welcome message
-            if( ylc.is_front_end )
+            if ( ylc.is_front_end )
                 this.objs.cnv.find( '.chat-welc' ).hide();
 
-            if( this.objs.cnv ) {
+            if ( this.objs.cnv ) {
 
-                this.objs.cnv.append( chat_line ).scrollTop(10000);
+                this.objs.cnv.append( this.get_template( 'chat-line', {
+                    msg_id 		: msg.id,
+                    time 		: msg_time,
+                    date 		: d.getUTCDate() + ' ' + this.strings.months[ d.getUTCMonth() ] + ' ' + d.getUTCFullYear() + ' ' + t,
+                    color 		: 'transparent',
+                    avatar  	: this.set_avatar( msg.user_type, {
+                        gravatar    :  msg.gravatar,
+                        avatar_type :  msg.avatar_type,
+                        avatar_image:  msg.avatar_image
+                    } ),
+                    name 		: msg.user_name,
+                    msg 		: msg_content,
+                    class 		: ( msg.user_id == this.data.user.user_id ) ? ' chat-you' : ''
+                } ) ).scrollTop(10000);
 
             }
 
@@ -1646,72 +1676,74 @@ function string_replace( str, args ){
         /**
          * Add message into conversation
          */
-        sanitize_msg : function( str ) {
+        sanitize_msg        : function ( str ) {
 
-            var msg, pattern_url, pattern_pseudo_url, pattern_email;
+            var msg, pattern_url, pattern_pseudo_url, pattern_email, pattern_html;
+
+            pattern_html        = /(<([^>]+)>)/gim;
+            msg                 = str.replace(pattern_html, '');
 
             //URLs starting with http://, https://, or ftp://
-            pattern_url = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
-            msg = str.replace(pattern_url, '<a href="$1" target="_blank">$1</a>');
+            pattern_url         = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+            msg                 = msg.replace(pattern_url, '<a href="$1" target="_blank">$1</a>');
 
             //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
-            pattern_pseudo_url = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
-            msg = msg.replace(pattern_pseudo_url, '$1<a href="http://$2" target="_blank">$2</a>');
+            pattern_pseudo_url  = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+            msg                 = msg.replace( pattern_pseudo_url, '$1<a href="http://$2" target="_blank">$2</a>' );
 
             //Change email addresses to mailto:: links.
-            pattern_email = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
-            msg = msg.replace(pattern_email, '<a href="mailto:$1">$1</a>');
+            pattern_email       = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+            msg                 = msg.replace( pattern_email, '<a href="mailto:$1">$1</a>' );
+
+
 
             return msg;
-
 
         },
         /**
          * Manage reply box
          */
-        manage_reply_box : function( last_cnv_id ) {
+        manage_reply_box    : function ( last_cnv_id ) {
 
-            var self = this,
-                writing = false,
-                obj_reply = $( '#YLC_cnv_reply' ),
-
-                /**
-                 * Delay for a specified time
-                 */
-                fn_delay = ( function(){
-
+            var self        = this,
+                writing     = false,
+                obj_reply   = $( '#YLC_cnv_reply' ),
+                fn_delay    = ( function() {
+                    /**
+                     * Delay for a specified time
+                     */
                     var timer = 0;
 
-                    return function(callback, ms){
-                        clearTimeout (timer);
-                        timer = setTimeout(callback, ms);
+                    return function( callback, ms ){
+                        clearTimeout ( timer );
+                        timer = setTimeout( callback, ms );
                     };
 
                 } )();
 
             // First clean typing list in any case!
-            this.data.ref_cnv.child( this.data.user.cnv_id +  '/typing' ).remove();
+            this.data.ref_cnv.child( this.data.user.conversation_id +  '/typing' ).remove();
 
             // Manage reply box
             obj_reply.keydown( function(e) {
 
                 // When clicks ENTER key (but not shift + ENTER )
-                if ( e.keyCode === 13 && !e.shiftKey ) {
+                if ( e.keyCode === 13 && ! e.shiftKey ) {
 
                     e.preventDefault();
 
-                    var msg = $(this).val();
+                    var msg = $( this ).val();
 
                     if( msg ) {
 
                         // Clean reply box
-                        $(this).val('').trigger( 'autosize.resize' );
+                        $( this ).val( '' ).trigger( 'autosize.resize' );
 
                         // Send message to Firebase
                         self.push_msg( msg );
 
                         // User isn't typing anymore
-                        self.data.ref_cnv.child( self.data.user.cnv_id +  '/typing/' + self.data.user.id ).remove();
+                        self.data.ref_cnv.child( self.data.user.conversation_id +  '/typing/' + self.data.user.user_id ).remove();
 
                     }
 
@@ -1719,24 +1751,24 @@ function string_replace( str, args ){
                 } else {
 
                     // Check if current user (operator & visitor) is typing...
-                    if( !writing ) {
+                    if( ! writing ) {
 
                         // Don't listen some keys
                         switch( e.keyCode ) {
-                            case 17: // ctrl
-                            case 18: // alt
-                            case 16: // shift
-                            case 9: // tab
-                            case 8: // backspace
-                            case 224: // cmd (firefox)
-                            case 17:  // cmd (opera)
-                            case 91:  // cmd (safari/chrome) Left Apple
-                            case 93:  // cmd (safari/chrome) Right Apple
+                            case 17     : // ctrl
+                            case 18     : // alt
+                            case 16     : // shift
+                            case 9      : // tab
+                            case 8      : // backspace
+                            case 224    : // cmd (firefox)
+                            case 17     : // cmd (opera)
+                            case 91     : // cmd (safari/chrome) Left Apple
+                            case 93     : // cmd (safari/chrome) Right Apple
                                 return;
                         }
 
                         // Add user typing list in current conversation
-                        self.data.ref_cnv.child( self.data.user.cnv_id + '/typing/' + self.data.user.id ).set( self.data.user.name );
+                        self.data.ref_cnv.child( self.data.user.conversation_id + '/typing/' + self.data.user.user_id ).set( self.data.user.user_name );
 
                         // User is writing now
                         writing = true;
@@ -1748,7 +1780,7 @@ function string_replace( str, args ){
                     fn_delay( function() {
 
                         // User isn't typing anymore
-                        self.data.ref_cnv.child( self.data.user.cnv_id +  '/typing/' + self.data.user.id ).remove();
+                        self.data.ref_cnv.child( self.data.user.conversation_id +  '/typing/' + self.data.user.user_id ).remove();
 
                         // User isn't writing anymore
                         writing = false;
@@ -1756,8 +1788,6 @@ function string_replace( str, args ){
                     }, 1300 );
 
                 }
-
-
 
             });
 
@@ -1767,13 +1797,13 @@ function string_replace( str, args ){
             }
 
             // Check if a user is typing in current conversation...
-            this.data.ref_cnv.child( this.data.user.cnv_id + '/typing' ).on( 'value', function( snap ) {
+            this.data.ref_cnv.child( this.data.user.conversation_id + '/typing' ).on( 'value', function( snap ) {
 
-                var i = 0,
-                    users = snap.val(),
+                var i           = 0,
+                    users       = snap.val(),
                     total_users = ( users ) ? Object.keys( users ).length : 0;
 
-                if( !users ) {
+                if( ! users ) {
                     self.clean_ntf();
 
                     return;
@@ -1781,8 +1811,7 @@ function string_replace( str, args ){
 
                 $.each( users, function( user_id, user_name ) {
 
-                    // Hmm.. someone else writing
-                    if( user_id && user_id !== self.data.user.id ) {
+                    if( user_id != null && user_id != self.data.user.user_id ) {
 
                         // Show notification
                         self.display_ntf( self.strings.msg.writing.replace( /%s/i, user_name ), 'typing' );
@@ -1802,7 +1831,7 @@ function string_replace( str, args ){
             if( ylc.is_front_end ) { // Additional functions for front-end chat box
 
                 // Focus on reply box when user click around it
-                this.objs.popup.find('.chat-cnv-reply').click( function() {
+                this.objs.popup.find( '.chat-cnv-reply' ).click( function() {
                     obj_reply.focus();
                 });
 
@@ -1814,24 +1843,24 @@ function string_replace( str, args ){
          * It is good to use when user open empty conversation box on user interface
          * and show up old messages
          */
-        reload_cnv : function( cnv_id ) {
+        reload_cnv          : function ( cnv_id ) {
 
             var self = this;
 
             // Get current conversation messages
             this.data.ref_msgs.once( 'value', function( snap ) {
 
-                var now = new Date(),
-                    all_msgs = snap.val(),
-                    total_msgs = all_msgs ? Object.keys( all_msgs ).length : 0,
+                var now             = new Date(),
+                    all_msgs        = snap.val(),
+                    total_msgs      = all_msgs ? Object.keys( all_msgs ).length : 0,
                     total_user_msgs = 0,
-                    i = 1;
+                    i               = 1;
 
                 if( all_msgs ) {
 
                     $.each( all_msgs, function( msg_id, msg ) {
 
-                        if( msg.cnv_id == cnv_id ) {
+                        if( msg.conversation_id == cnv_id ) {
 
                             // This message from chat history
                             msg.old_msg = true;
@@ -1862,31 +1891,32 @@ function string_replace( str, args ){
 
                 }
 
-
             });
 
         },
         /**
          * Create new message
          */
-        push_msg : function( msg ) {
+        push_msg            : function ( msg ) {
 
             // Push message to Firebase
             this.data.ref_msgs.push({
-                user_id		: this.data.user.id,
-                user_type	: this.data.user.type,
-                cnv_id		: this.data.user.cnv_id,
-                name 		: this.data.user.name || this.data.user.email,
-                gravatar 	: this.data.user.gravatar,
-                msg 		: msg,
-                time 		: Firebase.ServerValue.TIMESTAMP
+                user_id		    : this.data.user.user_id,
+                user_type	    : this.data.user.user_type,
+                conversation_id : this.data.user.conversation_id,
+                user_name 		: this.data.user.user_name || this.data.user.user_email,
+                gravatar 	    : this.data.user.gravatar,
+                avatar_type     : this.data.user.avatar_type,
+                avatar_image    : this.data.user.avatar_image,
+                msg 		    : msg,
+                msg_time 		: Firebase.ServerValue.TIMESTAMP
             });
 
         },
         /**
          * Get template to render
          */
-        get_template: function( template, params ){
+        get_template        : function ( template, params ){
 
             var html;
 
@@ -1898,38 +1928,28 @@ function string_replace( str, args ){
                     break;
 
                 //Connecting
-                case 'connecting':
-                    html = ylc.templates.connecting;
+                case 'chat-connecting':
+                    html = ylc.templates.chat_connecting;
                     break;
 
                 //Button
-                case 'btn':
-                    html = ylc.templates.btn;
+                case 'chat-btn':
+                    html = ylc.templates.chat_btn;
                     break;
 
                 //Offline
-                case 'offline':
-                    html = ylc.templates.offline;
+                case 'chat-offline':
+                    html = ylc.templates.chat_offline;
                     break;
 
                 //Login popup
-                case 'login':
-                    html = ylc.templates.login;
+                case 'chat-login':
+                    html = ylc.templates.chat_login;
                     break;
 
                 //Online popup - frontend
-                case 'online-user':
-                    html = ylc.templates.online_user;
-                    break;
-
-                //Online - backend
-                case 'online-basic':
-                    html = ylc.templates.online_basic
-                    break;
-
-                //User item - backend
-                case 'user-item':
-                    html = ylc.templates.user_item;
+                case 'chat-conversation':
+                    html = ylc.templates.chat_conversation;
                     break;
 
                 //Chat lines
@@ -1937,19 +1957,24 @@ function string_replace( str, args ){
                     html = ylc.templates.chat_line;
                     break;
 
-                //User meta info - backend
-                case 'chat-user-meta-info':
-                    html = ylc.templates.chat_user_meta_info;
+                //User item - backend
+                case 'console-user-item':
+                    html = ylc.templates.console_user_item;
                     break;
 
-                //User meta tools - backend
-                case 'chat-user-meta-tools':
-                    html = ylc.templates.chat_user_meta_tools;
+                //Conversation - backend
+                case 'console-conversation':
+                    html = ylc.templates.console_conversation;
                     break;
 
-                //User meta page - backend
-                case 'chat-user-meta-page':
-                    html = ylc.templates.chat_user_meta_page;
+                //User info - backend
+                case 'console-user-info':
+                    html = ylc.templates.console_user_info;
+                    break;
+
+                //User tools - backend
+                case 'console-user-tools':
+                    html = ylc.templates.console_user_tools;
                     break;
 
                 default:
@@ -1957,14 +1982,25 @@ function string_replace( str, args ){
 
             }
 
+            return this.string_replace( html, params );
 
-            return string_replace( html, params );
-
+        },
+        /**
+         * Replace placeholder strings in templates
+         */
+        string_replace      : function ( str, args ){
+            for ( var key in args ){
+                if ( args.hasOwnProperty( key ) ) {
+                    var regex = new RegExp( 'ylc\.' + key , 'gm' );
+                    str = str.replace( regex, args[ key ] )
+                }
+            }
+            return str;
         },
         /**
          * Get a user data
          */
-        get_user_data : function( user_id, callback ) {
+        get_user_data       : function ( user_id, callback ) {
 
             this.data.ref_users.child( user_id ).once( 'value', function( snap ) {
 
@@ -1978,44 +2014,41 @@ function string_replace( str, args ){
         /**
          * Render button before showing up
          */
-        render_btn : function() {
+        render_btn          : function () {
 
             var self = this;
 
-            if( !ylc.is_front_end ) return;
+            if( ! ylc.is_front_end ) return;
 
-            // Find secondary colors
-            this.data.primary_fg = this.use_white( this.opts.styles.colors.primary ) ? '#ffffff' : '#444444';
-            this.data.link_fg = this.use_white( this.opts.styles.colors.link ) ? '#ffffff' : '#444444';
-            this.data.primary_hover = this.shade_color( this.opts.styles.colors.primary, 7 );
-            this.data.link_hover = this.shade_color( this.opts.styles.colors.link, 7 );
+            this.data.primary_fg    = this.use_white( this.opts.styles.bg_color ) ? '#ffffff' : '#444444';
+            this.data.primary_hover = this.shade_color( this.opts.styles.bg_color, 7 );
+
 
             // Render button
-            this.el.html( this.get_template( 'btn', {
-                title 			: this.strings.msg.chat_title,
-                color 			: this.data.primary_fg,
-                bg_color 		: this.opts.styles.colors.primary,
-                width 			: ( this.opts.styles.btn_width == 'auto' ) ? 'auto' : this.opts.styles.btn_width + 'px',
-                radius          : this.opts.styles.border_radius
+            this.el.html( this.get_template( 'chat-btn', {
+                title   : this.strings.msg.chat_title,
+                styles  : ( ylc.is_premium ) ? this.trigger_premium( 'stylize', 'chat_button' ) : ''
             } ) );
 
             this.objs.btn = $( '#YLC_chat_btn' );
 
+            // Find secondary colors
+
             // Chat button hover
             this.objs.btn.hover(
                 function() {
-                    $(this).css('background-color', self.data.primary_hover );
+                    $( this ).css( 'background-color', self.data.primary_hover );
                 },
                 function() {
-                    $(this).css('background-color', self.opts.styles.colors.primary );
+                    $( this ).css( 'background-color', self.opts.styles.bg_color );
                 }
             );
 
             // Manage button
             this.objs.btn.click( function() {
 
-                var obj_btn = $(this),
-                    obj_btn_title = $(this).find('.chat-title');
+                var obj_btn         = $( this ),
+                    obj_btn_title   = $( this ).find( '.chat-title' );
 
                 // Update button title
                 obj_btn_title.html( self.strings.msg.please_wait + '...' );
@@ -2033,87 +2066,88 @@ function string_replace( str, args ){
 
                 });
 
-
             });
 
             setTimeout( function() {
                 self.show_btn();
-            }, this.opts.styles.anim.anim_delay );
+            }, this.data.show_delay );
 
         },
         /**
          * Render popup
          */
-        render_popup : function() {
+        render_popup        : function () {
 
             var self = this;
 
-            if( !ylc.is_front_end ) return;
+            if( ! ylc.is_front_end ) return;
 
             this.el.append ( this.get_template( 'chat-popup', {
                 title 		: this.strings.msg.connecting + '...',
-                color 		: this.data.primary_fg,
-                bg_color 	: this.opts.styles.colors.primary,
+                header_styles  : ( ylc.is_premium ) ? this.trigger_premium( 'stylize', 'chat_header' ) : '',
+                widget_styles  : ( ylc.is_premium ) ? this.trigger_premium( 'stylize', 'chat_widget' ) : '',
                 body_class 	: 'chat-form',
-                radius 		: this.opts.styles.border_radius,
-                body 		: this.get_template( 'connecting', {
+                body 		: this.get_template( 'chat-connecting', {
                     lead: this.strings.msg.connecting + '...'
                 } )
             } ) );
 
-            this.objs.popup = $( '#YLC_chat' );
-            this.objs.popup_header = $( '#YLC_chat_header' );
-            this.objs.popup_body = $( '#YLC_chat_body' );
+            this.objs.popup         = $( '#YLC_chat' );
+            this.objs.popup_header  = $( '#YLC_chat_header' );
+            this.objs.popup_body    = $( '#YLC_chat_body' );
 
-            this.objs.popup_body.css( 'width', this.opts.styles.form_width + 'px' )
+            if ( this.opts.styles.y_pos !== 'bottom' ) {
+
+                this.objs.popup_body.attr( 'style', ( ylc.is_premium ) ? this.trigger_premium( 'stylize', 'chat_body' ) : '' );
+
+            }
+
+            this.objs.popup_body.css( 'width', this.opts.styles.form_width + 'px' );
 
             // Send button hover
-            $(document).on( 'hover', '#YLC_send_btn',
+            $( document ).on( 'hover', '#YLC_send_btn',
                 function() {
-                    $(this).css('background-color', self.data.link_hover );
+                    $( this ).css( 'background-color', self.data.primary_hover );
                 },
                 function() {
-                    $(this).css('background-color', self.opts.styles.colors.link );
+                    $( this ).css( 'background-color', self.opts.styles.bg_color );
                 }
             );
 
-            // Manage popup header
             this.objs.popup_header.click( function() {
 
-                // Just be offline, don't logout completely
-                self.be_offline();
-
-                // Minimize popup
                 self.minimize();
+                self.objs.popup_header.off('click');
 
             });
 
-
             // Set height of chat popup
-            $(window).resize(function() {
+            $( window ).resize( function() {
 
-                var w = window,
-                    d = document,
-                    e = d.documentElement,
-                    g = d.getElementsByTagName('body')[0],
-                    x = w.innerWidth || e.clientWidth || g.clientWidth,
-                    y = w.innerHeight|| e.clientHeight|| g.clientHeight,
-                    pop_h_y = self.objs.popup_header.innerHeight(), // Popup header height
-                    pop_b = parseInt( self.objs.popup.css( 'bottom' ), 10 ); // Popup bottom
+                var w       = window,
+                    d       = document,
+                    e       = d.documentElement,
+                    g       = d.getElementsByTagName( 'body' )[ 0 ],
+                    x       = w.innerWidth || e.clientWidth || g.clientWidth,
+                    y       = w.innerHeight|| e.clientHeight|| g.clientHeight,
+                    pop_h_y = self.objs.popup_header.height(), // Popup header height
+                    pop_b   = parseInt( self.objs.popup.css( 'bottom' ), 10 ); // Popup bottom
 
                 // Set max height
-                var default_y = ( self.data.mode === 'online' ) ? 370 : 450,
-                    max_y = ( default_y < y ) ? default_y : y - pop_h_y - pop_b;
+                var default_y = ( self.data.mode === 'online' ) ? 320 : 450,
+                    max_y = ( ( default_y + pop_h_y ) < y ) ? default_y : y - pop_h_y - pop_b;
 
                 self.objs.popup_body.css( 'max-height', max_y );
 
+                 if ( ylc.is_premium )
+                     self.trigger_premium( 'resize_chat' );
 
-            }).trigger('resize');
+            }).trigger( 'resize' );
         },
         /**
          * Show popup
          */
-        show_popup : function() {
+        show_popup          : function () {
 
             // Don't re-open popup
             if( this.data.popup_status == 'open' || !ylc.is_front_end ) return;
@@ -2127,7 +2161,14 @@ function string_replace( str, args ){
             this.objs.popup.show();
 
             // Show popup with animation
-            this.animate( this.objs.popup, this.opts.styles.anim.type );
+            this.animate( this.objs.popup, this.opts.styles.animation_type );
+
+            this.objs.popup_header.click( function() {
+
+                self.minimize();
+                self.objs.popup_header.off('click');
+
+            });
 
             // Focus on first field in the form
             setTimeout( function() {
@@ -2141,8 +2182,7 @@ function string_replace( str, args ){
                         $( '#YLC_cnv_reply' ).focus();
 
                         // Scroll down conversation if necessary
-                        self.objs.cnv.scrollTop(10000);
-
+                        self.objs.cnv.scrollTop( 10000 );
 
                         break;
 
@@ -2151,7 +2191,7 @@ function string_replace( str, args ){
                     case 'login':
 
                         // Focus first input in the form
-                        $( '#YLC_popup_form .chat-line:first-child input').focus();
+                        $( '#YLC_popup_form .chat-line:first-child input' ).focus();
 
                         break;
                 }
@@ -2160,20 +2200,20 @@ function string_replace( str, args ){
                 // Update popup status
                 self.data.popup_status = 'open';
 
-            }, this.opts.styles.anim.anim_delay );
+            }, this.data.animation_delay );
 
         },
         /**
          * Show button
          */
-        show_btn : function( title ) {
+        show_btn            : function ( title ) {
 
             if( ylc.is_front_end ) {
 
                 var self = this;
 
                 // Allow displaying?
-                if( !this.allow_chatbox() )
+                if( ! this.allow_chatbox() )
                     return;
 
                 // Just show btn
@@ -2183,7 +2223,7 @@ function string_replace( str, args ){
                 this.objs.btn.find( '.chat-title' ).html( title );
 
                 // Show and animate
-                this.animate( this.objs.btn, this.opts.styles.anim.type);
+                this.animate( this.objs.btn, this.opts.styles.animation_type );
 
             }
 
@@ -2191,7 +2231,7 @@ function string_replace( str, args ){
         /**
          * Minimize popup
          */
-        minimize : function() {
+        minimize            : function () {
 
             // Set cookie
             this.cookie( 'ylc_chat_widget_status', 'minimized' );
@@ -2207,17 +2247,17 @@ function string_replace( str, args ){
             this.objs.btn.show();
 
             // Display button
-            this.animate( this.objs.btn, this.opts.styles.anim.type );
+            this.animate( this.objs.btn, this.opts.styles.animation_type );
 
         },
         /**
          * Manage connections
          */
-        manage_conn : function() {
+        manage_conn         : function () {
 
             var self = this;
 
-            if( !this.data.ref_user ) {
+            if( ! this.data.ref_user ) {
                 return;
             }
 
@@ -2229,7 +2269,7 @@ function string_replace( str, args ){
                 if( snap.val() === true ) {
 
                     // Add this device to user's connections list
-                    var conn = self.data.ref_user.child('connections').push( true );
+                    var conn = self.data.ref_user.child( 'connections' ).push( true );
 
                     // When user disconnect, remove this device
                     conn.onDisconnect().remove();
@@ -2244,7 +2284,7 @@ function string_replace( str, args ){
                     self.data.ref_user.child( 'last_online' ).onDisconnect().set( Firebase.ServerValue.TIMESTAMP );
 
                     // Remove user typing list on disconnect
-                    self.data.ref_cnv.child( self.data.user.cnv_id +  '/typing/' + self.data.user.id ).onDisconnect().remove();
+                    self.data.ref_cnv.child( self.data.user.conversation_id +  '/typing/' + self.data.user.user_id ).onDisconnect().remove();
 
                 }
 
@@ -2254,15 +2294,15 @@ function string_replace( str, args ){
         /**
          * Custom POST wrapper
          */
-        post : function ( mode, data, callback ) {
+        post                : function ( action, mode, data, callback ) {
 
             var self = this;
 
-            $.post( ylc.ajax_url + '?action=ylc_ajax_callback&mode=' + mode, data, callback, 'json' )
-                .fail(function (jqXHR) {
+            $.post( ylc.ajax_url + '?action=' + action +'&mode=' + mode, data, callback, 'json' )
+                .fail( function ( jqXHR ) {
 
                     // Log error
-                    console.log(mode, ': ', jqXHR);
+                    console.log( mode, ': ', jqXHR );
 
                     return false;
 
@@ -2272,31 +2312,39 @@ function string_replace( str, args ){
         /**
          * Trigger
          */
-        trigger : function( event, p ) {
+        trigger             : function ( event, p ) {
 
-            var ret = this.opts[event].call(this, p);
+            var ret = this.opts[ event ].call( this, p );
 
             if( ret === false )
                 return false;
 
         },
         /**
+         * Trigger Premium
+         */
+        trigger_premium     : function ( event, p1, p2, p3, p4, p5, p6) {
+
+            return this.premium[ event ].call( this, p1, p2, p3, p4, p5, p6 );
+
+        },
+        /**
          * Check if browser supports notifications
          */
-        check_ntf : function() {
+        check_ntf           : function () {
 
             // No notification support and don't show it on front end
-            if( !( "Notification" in window ) || ylc.is_front_end ) {
+            if( ! ( "Notification" in window ) || ylc.is_front_end ) {
                 return;
 
                 // Otherwise, we need to ask the user for permission
                 // Note, Chrome does not implement the permission static property
                 // So we have to check for NOT 'denied' instead of 'default'
             } else if ( Notification.permission !== 'denied' ) {
-                Notification.requestPermission(function (permission) {
+                Notification.requestPermission( function ( permission ) {
 
                     // Whatever the user answers, we make sure we store the information
-                    if (!('permission' in Notification)) {
+                    if ( ! ( 'permission' in Notification ) ) {
                         Notification.permission = permission;
                     }
 
@@ -2307,7 +2355,7 @@ function string_replace( str, args ){
         /**
          * Display notification
          */
-        display_ntf : function( ntf, type ) {
+        display_ntf         : function ( ntf, type ) {
 
             var icon;
 
@@ -2327,33 +2375,90 @@ function string_replace( str, args ){
 
             }
 
-            $( '#YLC_popup_ntf' ).removeClass().addClass('chat-ntf chat-' + type).html( icon + ntf ).fadeIn(300);
+            $( '#YLC_popup_ntf' ).removeClass().addClass( 'chat-ntf chat-' + type ).html( icon + ntf ).fadeIn( 300 );
 
         },
         /**
          * Clean notification
          */
-        clean_ntf : function() {
+        clean_ntf           : function () {
 
-            $( '#YLC_popup_ntf' ).html('').hide();
+            $( '#YLC_popup_ntf' ).html( '' ).hide();
+
+        },
+        /**
+         * Clear user data
+         */
+        clear_user_data      : function ( cnv_id, callback ) {
+
+            var self    = this;
+
+            this.data.ref_cnv.child( cnv_id ).once( 'value', function( snap_cnv ) {
+
+                var cnv = snap_cnv.val();
+
+                if( !cnv )
+                    return;
+
+                var user_id = cnv.user_id;
+
+                self.data.ref_msgs.once( 'value', function( snap_msgs ) {
+
+                    var msgs        = snap_msgs.val(),
+                        total_msgs  = msgs ? Object.keys( msgs ).length : 0,
+                        i           = 0;
+
+                    if( msgs ) {
+
+                        $.each( msgs, function( msg_id, msg ) {
+
+                            i = i + 1;
+
+                            if( msg.conversation_id === cnv_id ) {
+
+                                self.data.ref_msgs.child( msg_id ).remove();
+
+                            }
+
+                            if( total_msgs === i ) {
+
+                                if( callback )
+                                    callback();
+
+                            }
+
+                        });
+
+                    } else if( callback ) {
+
+                        callback();
+
+                    }
+
+                    self.data.ref_users.child( user_id ).remove();
+                    self.data.ref_cnv.child( cnv_id ).remove();
+
+                });
+
+            });
 
         },
         /**
          * Create or read cookie
          */
-        cookie : function( name, value, days ) {
+        cookie              : function ( name, value, days ) {
 
             // Create new cookie
             if( value || days === -1 ) {
 
-                if (days) {
+                var expires = '';
+
+                if ( days ) {
                     var date = new Date();
                     date.setTime( date.getTime() + ( days * 24 * 60 * 60 * 1000 ) );
-                    var expires = '; expires=' + date.toGMTString();
+                    expires = '; expires=' + date.toGMTString();
 
-                } else
-                    var expires = '';
-
+                }
 
                 document.cookie = name + '=' + value + expires + '; path=/';
 
@@ -2361,12 +2466,12 @@ function string_replace( str, args ){
             } else {
 
                 var name_eq = name + "=";
-                var ca = document.cookie.split(';');
+                var ca      = document.cookie.split( ';' );
 
-                for(var i=0;i < ca.length;i++) {
-                    var c = ca[i];
-                    while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                    if (c.indexOf(name_eq) === 0) return c.substring(name_eq.length,c.length);
+                for( var i = 0; i < ca.length; i++) {
+                    var c = ca[ i ];
+                    while ( c.charAt( 0 ) == ' ') c = c.substring( 1, c.length );
+                    if ( c.indexOf( name_eq ) === 0 ) return c.substring( name_eq.length, c.length );
                 }
 
                 return null;
@@ -2376,18 +2481,19 @@ function string_replace( str, args ){
         /**
          * Total number of online operators
          */
-        total_online_ops : function() {
+        total_online_ops    : function () {
 
-            if( this.data.online_ops )
-                return Object.keys(this.data.online_ops).length;
-            else
+            if( this.data.online_ops ) {
+                return Object.keys( this.data.online_ops ).length;
+            } else {
                 return 0;
+            }
 
         },
         /**
          * Chatbox allowed to show up?
          */
-        allow_chatbox : function() {
+        allow_chatbox       : function () {
 
             return this.opts.render ? true : false;
 
@@ -2395,38 +2501,41 @@ function string_replace( str, args ){
         /**
          * Animate
          */
-        animate : function( obj, anim ) {
+        animate             : function ( obj, anim ) {
 
-            $(window).trigger('resize'); // Resize window to ensure chat box is responsive
+            $( window ).trigger( 'resize' );
 
-            obj.addClass( 'chat-anim chat-hinge chat-' + anim );
+            var direction = ( this.opts.styles.y_pos === 'top' ) ? 'Down' : 'Up';
+
+
+            obj.addClass( 'chat-anim chat-' + anim + direction );
 
             // Remove CSS animation
             setTimeout( function() {
-                obj.removeClass( 'chat-anim chat-hinge chat-' + anim );
-            }, this.opts.styles.anim.anim_delay );
+                obj.removeClass( 'chat-anim chat-' + anim + direction );
+            }, this.data.animation_delay );
         },
         /**
          * Shade color original code: Pimp Trizkit (http://stackoverflow.com/a/13542669/272478)
          */
-        shade_color : function( color, percent ) {
-            var num = parseInt(color.slice(1),16),
-                amt = Math.round(2.55 * percent),
-                R = (num >> 16) + amt,
-                B = (num >> 8 & 0x00FF) + amt,
-                G = (num & 0x0000FF) + amt;
+        shade_color         : function ( color, percent ) {
+            var num = parseInt( color.slice( 1 ), 16 ),
+                amt = Math.round( 2.55 * percent ),
+                R   = ( num >> 16 ) + amt,
+                B   = ( num >> 8 & 0x00FF ) + amt,
+                G   = ( num & 0x0000FF ) + amt;
 
-            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+            return "#" + ( 0x1000000 + ( R < 255 ? R < 1 ? 0 : R : 255 ) * 0x10000 + ( B < 255 ? B < 1 ? 0 : B : 255 ) * 0x100 + ( G < 255 ? G < 1 ? 0 : G : 255 ) ).toString( 16 ).slice( 1 );
         },
         /**
          * Check if foreground color should be white? original code: Alnitak (http://stackoverflow.com/a/12043228/272478)
          */
-        use_white : function( c ) {
-            var c = c.substring(1);      // strip #
-            var rgb = parseInt(c, 16);   // convert rrggbb to decimal
-            var r = (rgb >> 16) & 0xff;  // extract red
-            var g = (rgb >>  8) & 0xff;  // extract green
-            var b = (rgb >>  0) & 0xff;  // extract blue
+        use_white           : function ( c ) {
+            var c   = c.substring( 1 );      // strip #
+            var rgb = parseInt( c, 16 );   // convert rrggbb to decimal
+            var r   = ( rgb >> 16 ) & 0xff;  // extract red
+            var g   = ( rgb >>  8 ) & 0xff;  // extract green
+            var b   = ( rgb >>  0 ) & 0xff;  // extract blue
 
             var luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; // per ITU-R BT.709
 
@@ -2438,14 +2547,14 @@ function string_replace( str, args ){
         /**
          * Validate email
          */
-        validate_email : function( email ) {
+        validate_email      : function ( email ) {
             var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
             return re.test( email );
         },
         /**
          * MD5 hash (http://www.webtoolkit.info/javascript-md5.html)
          */
-        md5 : function(e) {
+        md5                 : function ( e ) {
             function h(a,b){var c,d,e,f,g;e=a&2147483648;f=b&2147483648;c=a&1073741824;d=b&1073741824;g=(a&1073741823)+(b&1073741823);return c&d?g^2147483648^e^f:c|d?g&1073741824?g^3221225472^e^f:g^1073741824^e^f:g^e^f}function k(a,b,c,d,e,f,g){a=h(a,h(h(b&c|~b&d,e),g));return h(a<<f|a>>>32-f,b)}function l(a,b,c,d,e,f,g){a=h(a,h(h(b&d|c&~d,e),g));return h(a<<f|a>>>32-f,b)}function m(a,b,d,c,e,f,g){a=h(a,h(h(b^d^c,e),g));return h(a<<f|a>>>32-f,b)}function n(a,b,d,c,e,f,g){a=h(a,h(h(d^(b|~c),
                 e),g));return h(a<<f|a>>>32-f,b)}function p(a){var b="",d="",c;for(c=0;3>=c;c++)d=a>>>8*c&255,d="0"+d.toString(16),b+=d.substr(d.length-2,2);return b}var f=[],q,r,s,t,a,b,c,d;e=function(a){a=a.replace(/\r\n/g,"\n");for(var b="",d=0;d<a.length;d++){var c=a.charCodeAt(d);128>c?b+=String.fromCharCode(c):(127<c&&2048>c?b+=String.fromCharCode(c>>6|192):(b+=String.fromCharCode(c>>12|224),b+=String.fromCharCode(c>>6&63|128)),b+=String.fromCharCode(c&63|128))}return b}(e);f=function(b){var a,c=b.length;a=
                 c+8;for(var d=16*((a-a%64)/64+1),e=Array(d-1),f=0,g=0;g<c;)a=(g-g%4)/4,f=g%4*8,e[a]|=b.charCodeAt(g)<<f,g++;a=(g-g%4)/4;e[a]|=128<<g%4*8;e[d-2]=c<<3;e[d-1]=c>>>29;return e}(e);a=1732584193;b=4023233417;c=2562383102;d=271733878;for(e=0;e<f.length;e+=16)q=a,r=b,s=c,t=d,a=k(a,b,c,d,f[e+0],7,3614090360),d=k(d,a,b,c,f[e+1],12,3905402710),c=k(c,d,a,b,f[e+2],17,606105819),b=k(b,c,d,a,f[e+3],22,3250441966),a=k(a,b,c,d,f[e+4],7,4118548399),d=k(d,a,b,c,f[e+5],12,1200080426),c=k(c,d,a,b,f[e+6],17,2821735955),
@@ -2457,9 +2566,88 @@ function string_replace( str, args ){
         /**
          * Random ID
          */
-        random_id : function( min, max ) {
+        random_id           : function ( min, max ) {
 
             return Math.floor( Math.random() * ( max - min + 1 ) ) + min;
+
+        },
+        /**
+         * Purge Firebase from inactive users and conversations
+         */
+        purge_firebase      : function ( force_purge ) {
+
+            var self = this;
+
+            this.data.ref_users.once( 'value', function( snap ) {
+
+                var users       = snap.val(),
+                    i           = 0,
+                    del_list    = [],
+                    cnv_list    = [],
+                    interval    = ( force_purge ) ? 0 : 3600; //3600 = 1 hour
+
+                if( users !== null ) {
+
+                    var total_user  = Object.keys( users ).length,
+                        now         = new Date();
+
+                    $.each( users, function( user_id, user ) {
+
+                        i++;
+
+                        if( user ) {
+
+                            if( user.user_type != 'operator' && user.status === 'offline' ) {
+
+                                var seconds = ( ( now.getTime() - user.last_online ) * 0.001 ) >> 0;
+
+                                if ( seconds >= interval ) {
+
+                                    if ( user.conversation_id != null ) {
+
+                                        cnv_list.push( user.conversation_id )
+
+                                    } else {
+
+                                        del_list.push( user_id )
+
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        if( i === total_user ) {
+
+                            $.each( del_list , function( index, user_id ) {
+
+                                self.data.ref_users.child( user_id ).remove()
+
+                            });
+
+                            $.each( cnv_list , function( index, cnv_id ) {
+
+                                if ( ylc.is_premium ){
+
+                                    self.trigger_premium( 'save_user_data', cnv_id, true, now.getTime() );
+
+                                } else {
+
+                                    self.clear_user_data( cnv_id );
+
+                                }
+
+                            });
+
+                        }
+
+                    });
+
+                }
+
+            });
 
         }
 
@@ -2468,12 +2656,12 @@ function string_replace( str, args ){
 	/*
 	 * Plugin wrapper, preventing against multiple instantiations and allowing any public function to be called via the jQuery plugin
 	 */
-	$.fn[YLC] = function ( arg ) {
+	$.fn[ YLC ] = function ( arg, arg_prem ) {
 
 		var args, instance;
 		
 		// only allow the plugin to be instantiated once
-		if ( !( this.data( data_plugin ) instanceof Plugin ) ) {
+		if ( ! ( this.data( data_plugin ) instanceof Plugin ) ) {
 
 			// if no instance, create one
 			this.data( data_plugin, new Plugin( this ) );
@@ -2490,17 +2678,17 @@ function string_replace( str, args ){
 		if (typeof arg === 'undefined' || typeof arg === 'object') {
 			
 			if ( typeof instance['init'] === 'function' ) {
-				instance.init( arg );
+				instance.init( arg, arg_prem );
 			}
 			
 		// checks that the requested public method exists
-		} else if ( typeof arg === 'string' && typeof instance[arg] === 'function' ) {
+		} else if ( typeof arg === 'string' && typeof instance[ arg ] === 'function' ) {
 		
 			// copy arguments & remove function name
 			args = Array.prototype.slice.call( arguments, 1 );
 			
 			// call the method
-			return instance[arg].apply( instance, args );
+			return instance[ arg ].apply( instance, args );
 			
 		} else {
 		

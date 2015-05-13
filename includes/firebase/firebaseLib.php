@@ -1,6 +1,5 @@
 <?php
-namespace Firebase;
-use \Exception;
+
 /**
  * Firebase PHP Client Library
  *
@@ -27,17 +26,17 @@ class FirebaseLib implements FirebaseInterface
      * @param string $baseURI
      * @param string $token
      */
-    function __construct($baseURI = '', $token = '')
+    function __construct( $baseURI = '', $token = '' )
     {
-        if ($baseURI == '') {
-            trigger_error('You must provide a baseURI variable.', E_USER_ERROR);
+        if ( $baseURI == '' ) {
+            trigger_error( 'You must provide a baseURI variable.', E_USER_ERROR );
         }
-        if (!extension_loaded('curl')) {
-            trigger_error('Extension CURL is not loaded.', E_USER_ERROR);
+        if ( !extension_loaded( 'curl' ) ) {
+            trigger_error( 'Extension CURL is not loaded.', E_USER_ERROR );
         }
-        $this->setBaseURI($baseURI);
-        $this->setTimeOut(10);
-        $this->setToken($token);
+        $this->setBaseURI( $baseURI );
+        $this->setTimeOut( 10 );
+        $this->setToken( $token );
     }
     /**
      * Sets Token
@@ -46,7 +45,7 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return void
      */
-    public function setToken($token)
+    public function setToken( $token )
     {
         $this->_token = $token;
     }
@@ -57,9 +56,9 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return void
      */
-    public function setBaseURI($baseURI)
+    public function setBaseURI( $baseURI )
     {
-        $baseURI .= (substr($baseURI, -1) == '/' ? '' : '/');
+        $baseURI .= ( substr( $baseURI, -1 ) == '/' ? '' : '/');
         $this->_baseURI = $baseURI;
     }
     /**
@@ -68,11 +67,11 @@ class FirebaseLib implements FirebaseInterface
      * @param String $path to data
      * @return string
      */
-    private function _getJsonPath($path)
+    private function _getJsonPath( $path )
     {
         $url = $this->_baseURI;
-        $path = ltrim($path, '/');
-        $auth = ($this->_token == '') ? '' : '?auth=' . $this->_token;
+        $path = ltrim( $path, '/' );
+        $auth = ( $this->_token == '' ) ? '' : '?auth=' . $this->_token;
         return $url . $path . '.json' . $auth;
     }
     /**
@@ -82,7 +81,7 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return void
      */
-    public function setTimeOut($seconds)
+    public function setTimeOut( $seconds )
     {
         $this->_timeout = $seconds;
     }
@@ -95,9 +94,9 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return Array Response
      */
-    public function set($path, $data)
+    public function set( $path, $data )
     {
-        return $this->_writeData($path, $data, 'PUT');
+        return $this->_writeData( $path, $data, 'PUT' );
     }
     /**
      * Pushing data into Firebase with a POST request
@@ -108,9 +107,9 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return Array Response
      */
-    public function push($path, $data)
+    public function push( $path, $data )
     {
-        return $this->_writeData($path, $data, 'POST');
+        return $this->_writeData( $path, $data, 'POST' );
     }
     /**
      * Updating data into Firebase with a PATH request
@@ -121,9 +120,9 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return Array Response
      */
-    public function update($path, $data)
+    public function update( $path, $data )
     {
-        return $this->_writeData($path, $data, 'PATCH');
+        return $this->_writeData( $path, $data, 'PATCH' );
     }
     /**
      * Reading data from Firebase
@@ -133,13 +132,13 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return Array Response
      */
-    public function get($path)
+    public function get( $path )
     {
         try {
-            $ch = $this->_getCurlHandler($path, 'GET');
-            $return = curl_exec($ch);
-            curl_close($ch);
-        } catch (Exception $e) {
+            $ch = $this->_getCurlHandler( $path, 'GET' );
+            $return = curl_exec( $ch );
+            curl_close( $ch );
+        } catch ( Exception $e ) {
             $return = null;
         }
         return $return;
@@ -152,13 +151,13 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return Array Response
      */
-    public function delete($path)
+    public function delete( $path )
     {
         try {
-            $ch = $this->_getCurlHandler($path, 'DELETE');
-            $return = curl_exec($ch);
-            curl_close($ch);
-        } catch (Exception $e) {
+            $ch = $this->_getCurlHandler( $path, 'DELETE' );
+            $return = curl_exec( $ch );
+            curl_close( $ch );
+        } catch ( Exception $e ) {
             $return = null;
         }
         return $return;
@@ -170,32 +169,32 @@ class FirebaseLib implements FirebaseInterface
      *
      * @return CURL Curl Handler
      */
-    private function _getCurlHandler($path, $mode)
+    private function _getCurlHandler( $path, $mode )
     {
-        $url = $this->_getJsonPath($path);
+        $url = $this->_getJsonPath( $path );
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $this->_timeout);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->_timeout);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $mode);
+        curl_setopt( $ch, CURLOPT_URL, $url );
+        curl_setopt( $ch, CURLOPT_TIMEOUT, $this->_timeout );
+        curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $this->_timeout );
+        curl_setopt( $ch, CURLOPT_SSL_VERIFYPEER, false );
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
+        curl_setopt( $ch, CURLOPT_CUSTOMREQUEST, $mode );
         return $ch;
     }
-    private function _writeData($path, $data, $method = 'PUT')
+    private function _writeData( $path, $data, $method = 'PUT' )
     {
-        $jsonData = json_encode($data);
+        $jsonData = ( is_array( $data ) ) ? json_encode( $data ) : $data; // If not json, encode it
         $header = array(
             'Content-Type: application/json',
-            'Content-Length: ' . strlen($jsonData)
+            'Content-Length: ' . strlen( $jsonData )
         );
         try {
-            $ch = $this->_getCurlHandler($path, $method);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-            $return = curl_exec($ch);
-            curl_close($ch);
-        } catch (Exception $e) {
+            $ch = $this->_getCurlHandler( $path, $method );
+            curl_setopt( $ch, CURLOPT_HTTPHEADER, $header );
+            curl_setopt( $ch, CURLOPT_POSTFIELDS, $jsonData );
+            $return = curl_exec( $ch );
+            curl_close( $ch );
+        } catch ( Exception $e ) {
             $return = null;
         }
         return $return;
