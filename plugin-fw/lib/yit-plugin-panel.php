@@ -285,7 +285,7 @@ if ( ! class_exists( 'YIT_Plugin_Panel' ) ) {
                 <h2><?php echo $this->get_tab_title() ?></h2>
                 <?php if ( $this->is_show_form() ) : ?>
                     <form method="post" action="options.php">
-                        <?php do_settings_sections( 'yith-plugin-fw' ); ?>
+                        <?php do_settings_sections( 'yit' ); ?>
                         <p>&nbsp;</p>
                         <?php settings_fields( 'yit_' . $this->settings['parent'] . '_options' ); ?>
                         <input type="hidden" name="<?php echo $this->get_name_field( 'current_tab' ) ?>" value="<?php echo esc_attr( $current_tab ) ?>" />

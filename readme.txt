@@ -4,7 +4,7 @@ Contributors: yithemes
 Tags: yit, yith, live chat, real time, firebase, ajax, customer help, customer support, free chat, live help, online support, helpdesk, chat, wordpress chat,  free live chat, group chat, online live chat, online support, plugin chat, private message, chat support, live customer support, live support chat, web chat
 Requires at least: 4.0
 Tested up to: 4.2.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,11 @@ YITH Live Chat will add a new tab called "Live Chat" inside the YIT Plugins menu
 
 == Changelog == 
 
+= 1.0.1 =
+
+* Code Improvements
+* Update core plugin
+
 = 1.0.0 =
 
 * Initial release
@@ -58,7 +63,7 @@ That's the way:
 
 == Upgrade Notice ==
 
-Last Stable Tag 1.0.0
+Last Stable Tag 1.0.1
 
 == Suggestions ==
 
