@@ -234,13 +234,7 @@ if ( ! function_exists( 'ylc_get_current_page_url' ) ) {
             $page_URL .= "s";
         }
 
-        $page_URL .= '://';
-
-        if ( @$_SERVER['SERVER_PORT'] != '80' ) {
-            $page_URL .= $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . $_SERVER['REQUEST_URI'];
-        } else {
-            $page_URL .= $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
-        }
+        $page_URL .= '://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
 
         return $page_URL;
 

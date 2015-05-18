@@ -167,7 +167,7 @@ if ( ! function_exists( 'ylc_set_firebase_security' ) ){
 
             $last_update = get_option( 'ylc_security_version' );
 
-            if(  empty( $last_update ) || version_compare( YLC_VERSION, $last_update, '>' ) ) {
+            //if(  empty( $last_update ) || version_compare( YLC_VERSION, $last_update, '>' ) ) {
 
                 require_once YLC_DIR . '/includes/firebase/firebaseInterface.php';
                 require_once YLC_DIR . '/includes/firebase/firebaseLib.php';
@@ -183,7 +183,7 @@ if ( ! function_exists( 'ylc_set_firebase_security' ) ){
                         update_option( 'ylc_security_version', YLC_VERSION );
                 }
 
-            }
+            //}
 
         }
 

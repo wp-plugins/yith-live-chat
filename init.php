@@ -5,7 +5,7 @@
  * Description: Pre-sales question ? Needs support ? Chat with your customers!
  * Author: Yithemes
  * Text Domain: ylc
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author URI: http://yithemes.com/
  */
 
@@ -26,7 +26,7 @@ function ylc_install_free_admin_notice() {
 }
 
 if ( ! defined( 'YLC_VERSION' ) ) {
-    define( 'YLC_VERSION', '1.0.1' );
+    define( 'YLC_VERSION', '1.0.2' );
 }
 
 if ( ! defined( 'YLC_FREE_INIT' ) ) {

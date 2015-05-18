@@ -46,7 +46,7 @@ return array(
                 'desc'              => __( 'This text will appear in the login form', 'ylc' ),
                 'id'                => 'text-welcome',
                 'type'              => 'textarea',
-                'std'               => __( 'Questions? Send us a message!', 'ylc' ),
+                'std'               => __( 'Have you got question? Write to us!', 'ylc' ),
                 'custom_attributes' => array(
                     'required'  => 'required',
                     'class'     => 'textareas'
@@ -57,7 +57,7 @@ return array(
                 'desc'              => __( 'This text will appear when the chat starts', 'ylc' ),
                 'id'                => 'text-start-chat',
                 'type'              => 'textarea',
-                'std'               => __( 'Questions, issues or concerns? I\'d love to help you!', 'ylc' ),
+                'std'               => __( 'Questions, doubts, issues? We\'re here to help you!', 'ylc' ),
                 'custom_attributes' => array(
                     'required'  => 'required',
                     'class'     => 'textareas'
@@ -79,7 +79,7 @@ return array(
                 'desc'              => __( 'This text will appear if no operator is online', 'ylc' ),
                 'id'                => 'text-offline',
                 'type'              => 'textarea',
-                'std'               => __( 'Our operators are offline. Please try again later', 'ylc' ),
+                'std'               => __( 'None of our operators are available at the moment. Please, try again later.', 'ylc' ),
                 'custom_attributes' => array(
                     'required'  => 'required',
                     'class'     => 'textareas'

@@ -162,6 +162,7 @@
                     field_empty         : ylc.strings.msg.field_empty,
                     invalid_email       : ylc.strings.msg.invalid_email,
                     invalid_username    : ylc.strings.msg.invalid_username,
+                    user_name           : ylc.strings.msg.user_name,
                     user_email          : ylc.strings.msg.user_email,
                     user_ip             : ylc.strings.msg.user_ip,
                     user_page           : ylc.strings.msg.user_page,
@@ -449,7 +450,7 @@
         /**
          * Logout from Firebase
          */
-        logout              : function () {
+        logout              : function ( end_chat ) {
 
             var self = this;
 
@@ -476,31 +477,31 @@
                     form : ''
                 } ) );
 
-            if ( ylc.is_premium && ylc.chat_evaluation ) {
 
-                self.trigger_premium( 'show_chat_evaluation' );
+            if ( ylc.is_premium ){
 
-            } else if ( ylc.is_premium && ! ylc.chat_evaluation && ylc.send_transcript && self.data.user.user_email != '' ){
-
-                self.trigger_premium( 'show_copy_request' );
+                self.trigger_premium( 'end_chat_options', end_chat );
 
             } else {
 
-                self.objs.popup_header.click( function() {
-
-                    self.minimize();
-                    self.objs.popup_header.off('click');
-
-                });
+                if ( end_chat )
+                    self.clear_user_data( self.data.user.conversation_id );
 
                 setTimeout( function() {
 
                     self.be_offline();
                     self.minimize();
 
-                }, 3000 );
+                }, 2000 );
 
             }
+
+            self.objs.popup_header.click( function() {
+
+                self.minimize();
+                self.objs.popup_header.off('click');
+
+            });
 
             // Resize window to ensure chat box is responsive
             $( window ).trigger( 'resize' );
@@ -1144,7 +1145,7 @@
 
                     self.push_msg( '-- ' + self.strings.msg.close_msg_user + ' --' );
                     self.data.ref_cnv.child( self.data.user.conversation_id ).child( 'status' ).set( 'closed' );
-                    self.logout();
+                    self.logout( true );
 
                     return;
 
@@ -1678,10 +1679,15 @@
          */
         sanitize_msg        : function ( str ) {
 
-            var msg, pattern_url, pattern_pseudo_url, pattern_email, pattern_html;
+            var msg, pattern_url, pattern_pseudo_url, pattern_email, pattern_html, pattern_line;
 
+            //removes html tags to avoid malicious code
             pattern_html        = /(<([^>]+)>)/gim;
             msg                 = str.replace(pattern_html, '');
+
+            //renders multiline
+            pattern_line        = /\n/gim;
+            msg                 =  msg.replace(pattern_line, '<br />');
 
             //URLs starting with http://, https://, or ftp://
             pattern_url         = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
@@ -1694,8 +1700,6 @@
             //Change email addresses to mailto:: links.
             pattern_email       = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
             msg                 = msg.replace( pattern_email, '<a href="mailto:$1">$1</a>' );
-
-
 
             return msg;
 
