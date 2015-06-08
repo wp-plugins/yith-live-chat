@@ -276,6 +276,13 @@ if ( ! class_exists( 'YITH_Livechat' ) ) {
 
             $this->load_fontawesome();
 
+            $query_args = array(
+                'family' => '=Open+Sans:400italic,600italic,700italic,400,700,600'
+            );
+            wp_register_style( 'ylc-google-fonts', add_query_arg( $query_args, "//fonts.googleapis.com/css" ), array(), null );
+            wp_enqueue_style( 'ylc-google-fonts' );
+
+
             wp_register_style( 'ylc-frontend', YLC_ASSETS_URL  . '/css/ylc-frontend.css' );
             wp_enqueue_style( 'ylc-frontend' );
 
@@ -334,6 +341,12 @@ if ( ! class_exists( 'YITH_Livechat' ) ) {
 
                 // Application JS
                 $this->load_livechat_js();
+
+                $query_args = array(
+                    'family' => '=Open+Sans:400italic,600italic,700italic,400,700,600'
+                );
+                wp_register_style( 'ylc-google-fonts', add_query_arg( $query_args, "//fonts.googleapis.com/css" ), array(), null );
+                wp_enqueue_style( 'ylc-google-fonts' );
 
                 // Console stylesheet
                 wp_register_style( 'ylc-console', YLC_ASSETS_URL . '/css/ylc-console.css' );
