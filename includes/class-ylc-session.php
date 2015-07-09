@@ -8,7 +8,7 @@
  * http://www.gnu.org/licenses/gpl-3.0.txt
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( !defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class YLC_Session {
 
-    private $session        = array();
+    private $session = array();
 
     /**
      * Constructor
@@ -34,9 +34,9 @@ class YLC_Session {
      */
     public function __construct() {
 
-        add_action( 'wp_login', array ( $this, 'destroy_session' ) );
-        add_action( 'wp_logout', array ( $this, 'logout' ) );
-        add_action( 'init', array( $this, 'init' ), -1 );
+        add_action( 'wp_login', array( $this, 'destroy_session' ) );
+        add_action( 'wp_logout', array( $this, 'logout' ) );
+        add_action( 'init', array( $this, 'init' ), - 1 );
 
     }
 
@@ -69,13 +69,15 @@ class YLC_Session {
      * Get a session variable
      *
      * @since   1.0.0
+     *
      * @param   $key
+     *
      * @return  string
      * @author  Alberto Ruggiero
      */
     public function get( $key ) {
 
-        return isset( $this->session[ $key ] ) ? maybe_unserialize( $this->session[ $key ] ) : false;
+        return isset( $this->session[$key] ) ? maybe_unserialize( $this->session[$key] ) : false;
 
     }
 
@@ -83,17 +85,19 @@ class YLC_Session {
      * Set a session variable
      *
      * @since   1.0.0
+     *
      * @param   $key
      * @param   $value
+     *
      * @return  mixed
      * @author  Alberto Ruggiero
      */
     public function set( $key, $value ) {
 
-        $this->session[ $key ]      = $value;
+        $this->session[$key]        = $value;
         $_SESSION['yith_live_chat'] = $this->session;
 
-        return $this->session[ $key ];
+        return $this->session[$key];
     }
 
     /**
@@ -127,7 +131,12 @@ class YLC_Session {
         global $yith_livechat;
 
         $yith_livechat->session->set( 'user_data', NULL );
-        session_destroy();
+
+        if ( !empty( $_SESSION ) ) {
+
+            session_destroy();
+
+        }
 
     }
 
