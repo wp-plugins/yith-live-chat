@@ -63,13 +63,6 @@ YITH Live Chat will add a new tab called "Live Chat" inside the YIT Plugins menu
 
 * Initial release
 
-== Support ==
-Already knew it, right?! Great, but maybe you do not know that: if you're looking for how to install the plugins or how to use them within your Wordpress installations, which is the right way to ask support?
-That's the way:
-
-* Register on http://yithemes.com
-* Go to Support > Get Support
-
 == Upgrade Notice ==
 
 Last Stable Tag 1.0.3
