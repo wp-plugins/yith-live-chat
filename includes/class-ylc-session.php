@@ -132,9 +132,9 @@ class YLC_Session {
 
         $yith_livechat->session->set( 'user_data', NULL );
 
-        if ( !empty( $_SESSION ) ) {
+        if ( isset( $_SESSION['yith_live_chat'] ) ) {
 
-            session_destroy();
+            unset( $_SESSION['yith_live_chat'] );
 
         }
 
