@@ -1,0 +1,556 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: YITH Live Chat\n"
+"POT-Creation-Date: 2015-05-18 10:51+0100\n"
+"PO-Revision-Date: 2015-05-18 10:51+0100\n"
+"Last-Translator: \n"
+"Language-Team: Your Inspiration Themes <plugins@yithemes.com>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.7.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;__ngettext:1,2;__ngettext_noop:1,2;"
+"_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: ..\n"
+"X-Poedit-SearchPathExcluded-0: ../plugin-fw\n"
+
+#: ../class.yith-livechat.php:132
+msgid "General"
+msgstr ""
+
+#: ../class.yith-livechat.php:133
+msgid "Messages"
+msgstr ""
+
+#: ../class.yith-livechat.php:137
+msgid "Offline Messages"
+msgstr ""
+
+#: ../class.yith-livechat.php:138
+msgid "Conversation"
+msgstr ""
+
+#: ../class.yith-livechat.php:139
+msgid "Appearance"
+msgstr ""
+
+#: ../class.yith-livechat.php:141
+#: ../templates/chat-backend/chat-console.php:4
+msgid "Users"
+msgstr ""
+
+#: ../class.yith-livechat.php:143 ../class.yith-livechat.php:710
+msgid "Premium Version"
+msgstr ""
+
+#: ../class.yith-livechat.php:149 ../class.yith-livechat.php:150
+msgid "Live Chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:173 ../plugin-options/video-box.php:21
+#: ../plugin-options/video-box.php:27
+msgid "YITH Live Chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:199
+msgid ""
+"Please enter Firebase App URL and Firebase App Secret for YITH Live Chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:407
+msgid "January"
+msgstr ""
+
+#: ../class.yith-livechat.php:408
+msgid "February"
+msgstr ""
+
+#: ../class.yith-livechat.php:409
+msgid "March"
+msgstr ""
+
+#: ../class.yith-livechat.php:410
+msgid "April"
+msgstr ""
+
+#: ../class.yith-livechat.php:411 ../class.yith-livechat.php:425
+msgid "May"
+msgstr ""
+
+#: ../class.yith-livechat.php:412
+msgid "June"
+msgstr ""
+
+#: ../class.yith-livechat.php:413
+msgid "July"
+msgstr ""
+
+#: ../class.yith-livechat.php:414
+msgid "August"
+msgstr ""
+
+#: ../class.yith-livechat.php:415
+msgid "September"
+msgstr ""
+
+#: ../class.yith-livechat.php:416
+msgid "October"
+msgstr ""
+
+#: ../class.yith-livechat.php:417
+msgid "November"
+msgstr ""
+
+#: ../class.yith-livechat.php:418
+msgid "December"
+msgstr ""
+
+#: ../class.yith-livechat.php:421
+msgid "Jan"
+msgstr ""
+
+#: ../class.yith-livechat.php:422
+msgid "Feb"
+msgstr ""
+
+#: ../class.yith-livechat.php:423
+msgid "Mar"
+msgstr ""
+
+#: ../class.yith-livechat.php:424
+msgid "Apr"
+msgstr ""
+
+#: ../class.yith-livechat.php:426
+msgid "Jun"
+msgstr ""
+
+#: ../class.yith-livechat.php:427
+msgid "Jul"
+msgstr ""
+
+#: ../class.yith-livechat.php:428
+msgid "Aug"
+msgstr ""
+
+#: ../class.yith-livechat.php:429
+msgid "Sep"
+msgstr ""
+
+#: ../class.yith-livechat.php:430
+msgid "Oct"
+msgstr ""
+
+#: ../class.yith-livechat.php:431
+msgid "Nov"
+msgstr ""
+
+#: ../class.yith-livechat.php:432
+msgid "Dec"
+msgstr ""
+
+#: ../class.yith-livechat.php:435
+msgid "ago"
+msgstr ""
+
+#: ../class.yith-livechat.php:436
+msgid "less than a minute"
+msgstr ""
+
+#: ../class.yith-livechat.php:437
+msgid "about a minute"
+msgstr ""
+
+#: ../class.yith-livechat.php:438
+#, php-format
+msgid "%d minutes"
+msgstr ""
+
+#: ../class.yith-livechat.php:439
+msgid "about an hour"
+msgstr ""
+
+#: ../class.yith-livechat.php:440
+#, php-format
+msgid "about %d hours"
+msgstr ""
+
+#: ../class.yith-livechat.php:441
+msgid "a day"
+msgstr ""
+
+#: ../class.yith-livechat.php:442
+#, php-format
+msgid "%d days"
+msgstr ""
+
+#: ../class.yith-livechat.php:443
+msgid "about a month"
+msgstr ""
+
+#: ../class.yith-livechat.php:444
+#, php-format
+msgid "%d months"
+msgstr ""
+
+#: ../class.yith-livechat.php:445
+msgid "about a year"
+msgstr ""
+
+#: ../class.yith-livechat.php:446
+#, php-format
+msgid "%d years"
+msgstr ""
+
+#: ../class.yith-livechat.php:449
+msgid "Your Name"
+msgstr ""
+
+#: ../class.yith-livechat.php:450
+msgid "Please enter your name"
+msgstr ""
+
+#: ../class.yith-livechat.php:451
+msgid "Your Email"
+msgstr ""
+
+#: ../class.yith-livechat.php:452
+msgid "Please enter your email"
+msgstr ""
+
+#: ../class.yith-livechat.php:453
+msgid "Your Message"
+msgstr ""
+
+#: ../class.yith-livechat.php:454
+msgid "Write your question"
+msgstr ""
+
+#: ../class.yith-livechat.php:460
+msgid "Start Chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:464
+msgid "The user has closed the conversation"
+msgstr ""
+
+#: ../class.yith-livechat.php:465
+msgid "Type here and hit enter to chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:466
+msgid "Send"
+msgstr ""
+
+#: ../class.yith-livechat.php:467
+msgid "No operators online"
+msgstr ""
+
+#: ../class.yith-livechat.php:468
+msgid "No messages found"
+msgstr ""
+
+#: ../class.yith-livechat.php:469
+msgid "Sending"
+msgstr ""
+
+#: ../class.yith-livechat.php:470
+msgid "Connecting"
+msgstr ""
+
+#: ../class.yith-livechat.php:471
+#, php-format
+msgid "%s is writing"
+msgstr ""
+
+#: ../class.yith-livechat.php:472
+#: ../templates/chat-backend/chat-console.php:6
+#: ../templates/chat-backend/chat-console.php:12
+msgid "Please wait"
+msgstr ""
+
+#: ../class.yith-livechat.php:473
+msgid "Chat Online"
+msgstr ""
+
+#: ../class.yith-livechat.php:474
+msgid "Chat Offline"
+msgstr ""
+
+#: ../class.yith-livechat.php:475
+msgid "Your message"
+msgstr ""
+
+#: ../class.yith-livechat.php:476
+msgid "End chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:477
+msgid "Connection error!"
+msgstr ""
+
+#: ../class.yith-livechat.php:478
+msgid "You"
+msgstr ""
+
+#: ../class.yith-livechat.php:479
+msgid "Online"
+msgstr ""
+
+#: ../class.yith-livechat.php:480
+msgid "Offline"
+msgstr ""
+
+#: ../class.yith-livechat.php:481
+msgid "Please fill out all required fields"
+msgstr ""
+
+#: ../class.yith-livechat.php:482
+msgid "Email is invalid"
+msgstr ""
+
+#: ../class.yith-livechat.php:483
+msgid "Username is invalid"
+msgstr ""
+
+#: ../class.yith-livechat.php:484
+msgid "User Email"
+msgstr ""
+
+#: ../class.yith-livechat.php:485
+msgid "IP Address"
+msgstr ""
+
+#: ../class.yith-livechat.php:486
+msgid "Current Page"
+msgstr ""
+
+#: ../class.yith-livechat.php:487
+msgid "Connect"
+msgstr ""
+
+#: ../class.yith-livechat.php:488
+msgid "Disconnect"
+msgstr ""
+
+#: ../class.yith-livechat.php:489
+msgid "You are offline"
+msgstr ""
+
+#: ../class.yith-livechat.php:490
+msgid "Save chat"
+msgstr ""
+
+#: ../class.yith-livechat.php:491
+msgid ""
+"If you leave the chat, you will be logged out. However you will be able to "
+"save the conversations into your server when you will come back in the "
+"console!"
+msgstr ""
+
+#: ../class.yith-livechat.php:492
+msgid "New Message"
+msgstr ""
+
+#: ../class.yith-livechat.php:493
+msgid "New User Online"
+msgstr ""
+
+#: ../class.yith-livechat.php:494
+msgid "Saving"
+msgstr ""
+
+#: ../class.yith-livechat.php:495
+#, php-format
+msgid "User queue: %d"
+msgstr ""
+
+#: ../class.yith-livechat.php:495
+msgid "There are people waiting to talk"
+msgstr ""
+
+#: ../class.yith-livechat.php:496
+msgid "Good"
+msgstr ""
+
+#: ../class.yith-livechat.php:497
+msgid "Bad"
+msgstr ""
+
+#: ../class.yith-livechat.php:498
+msgid "Was this conversation useful? Vote this chat session."
+msgstr ""
+
+#: ../class.yith-livechat.php:499
+#, php-format
+msgid "Talking with %s"
+msgstr ""
+
+#: ../class.yith-livechat.php:500
+msgid "Elapsed time"
+msgstr ""
+
+#: ../class.yith-livechat.php:501
+msgid "Receive the copy of the chat via e-mail"
+msgstr ""
+
+#: ../class.yith-livechat.php:502
+msgid "A user is already logged in with the same email address"
+msgstr ""
+
+#: ../class.yith-livechat.php:634
+msgid "YITH Live Chat Operator"
+msgstr ""
+
+#: ../class.yith-livechat.php:707
+msgid "Settings"
+msgstr ""
+
+#: ../class.yith-livechat.php:735
+msgid "Plugin Documentation"
+msgstr ""
+
+#: ../includes/functions-ylc-ajax.php:100
+msgid "Successfully closed!"
+msgstr ""
+
+#: ../init.php:23
+msgid ""
+"You can't activate the free version of YITH Live Chat while you are using "
+"the premium one."
+msgstr ""
+
+#: ../plugin-options/general-options.php:20
+msgid "YITH Live Chat: General Settings"
+msgstr ""
+
+#: ../plugin-options/general-options.php:32
+msgid "Enable Live Chat"
+msgstr ""
+
+#: ../plugin-options/general-options.php:33
+msgid "Activate/Deactivate the live chat features. "
+msgstr ""
+
+#: ../plugin-options/general-options.php:39
+msgid "Firebase App URL"
+msgstr ""
+
+#: ../plugin-options/general-options.php:40
+msgid "URL of your Firebase application."
+msgstr ""
+
+#: ../plugin-options/general-options.php:50
+msgid "Firebase App Secret"
+msgstr ""
+
+#: ../plugin-options/general-options.php:51
+msgid ""
+"It can be found under the \"Secrets\" menu in your Firebase app dashboard"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:22
+msgid "YITH Live Chat: Message Settings"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:34
+msgid "Chat Title"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:35
+msgid "This text will appear in the chat button and the chat title"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:38
+msgid "Chat with us"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:45
+msgid "Welcome Message"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:46
+msgid "This text will appear in the login form"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:49
+msgid "Have you got question? Write to us!"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:56
+msgid "Starting Chat Message"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:57
+msgid "This text will appear when the chat starts"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:60
+msgid "Questions, doubts, issues? We're here to help you!"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:67
+msgid "Closing Chat Message"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:68
+msgid "This text will appear at the end of the chat"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:71
+msgid "This chat session has ended"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:78
+msgid "Offline Message"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:79
+msgid "This text will appear if no operator is online"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:82
+msgid ""
+"None of our operators are available at the moment. Please, try again later."
+msgstr ""
+
+#: ../plugin-options/texts-options.php:89
+msgid "Busy Message"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:90
+msgid "This text will appear if all operators are busy"
+msgstr ""
+
+#: ../plugin-options/texts-options.php:93
+msgid "Our operators are busy. Please try again later"
+msgstr ""
+
+#: ../plugin-options/video-box.php:18
+msgid "Upgrade to the PREMIUM VERSION"
+msgstr ""
+
+#: ../plugin-options/video-box.php:22
+msgid "Discover the Advanced Features"
+msgstr ""
+
+#: ../plugin-options/video-box.php:23
+msgid ""
+"Upgrade to the PREMIUM VERSION of YITH Live Chat to benefit from all the "
+"features!"
+msgstr ""
+
+#: ../plugin-options/video-box.php:29
+msgid "Get Support and Pro Features"
+msgstr ""
+
+#: ../plugin-options/video-box.php:30
+msgid ""
+"By purchasing the premium version of the plugin, you will take advantage of "
+"the advanced features of the product, and you will get one year of free "
+"updates and support through our platform available 24h/24."
+msgstr ""
